@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partidos Disponibles - Tu Padel</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>🎾 Partidos Disponibles</h1>
+        <p>Encuentra tu próxima partida en Tu Padel Valencia y Picaña</p>
+    </header>
+    <main>
+        <div class="filters">
+            <input type="date" id="date-filter">
+            <input type="text" id="level-filter" placeholder="Filtrar por nivel (ej: 4.0)">
+        </div>
+        <div id="loader">Cargando partidas...</div>
+        <div id="matches-container">
+            </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
