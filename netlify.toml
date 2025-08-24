@@ -1,0 +1,7 @@
+# netlify.toml
+# Regla de proxy para evitar problemas de CORS con la API de Google Apps Script
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://script.google.com/macros/s/AKfycbznLvaaiQDi6ouVpPEn97bXU7ubcdrHAnYYVRP9L0Ie5psTyte3FZXX4HEr7PfYW_Auqg/exec"
+  status = 200
