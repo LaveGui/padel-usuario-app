@@ -13,3 +13,18 @@ main { max-width: 900px; margin: 0 auto; }
 .match-card .players-list { margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
 .match-card .players-list h3 { font-size: 0.9em; margin: 0 0 5px 0; color: #1a73e8; }
 .match-card .player { font-size: 0.9em; }
+
+/* --- Estilos para el Formulario de Alertas --- */
+.form-container { background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 25px; margin-top: 30px; }
+.form-container h2 { text-align: center; margin-top: 0; color: #1a73e8; }
+#alert-form { display: flex; flex-direction: column; gap: 15px; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+.form-group { display: flex; flex-direction: column; }
+.form-group label { margin-bottom: 5px; font-weight: 500; color: #555; }
+.form-group input, .form-group select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em; }
+#alert-form hr { border: none; border-top: 1px solid #eee; margin: 10px 0; }
+.final-step label { font-weight: bold; text-align: center; font-size: 1.1em; }
+#alert-form button { background: #1a73e8; color: #fff; border: none; padding: 12px; font-size: 1.1em; border-radius: 5px; cursor: pointer; transition: background 0.2s; }
+#alert-form button:hover { background: #185abc; }
+#any-date-btn { background: #eee; border: 1px solid #ddd; padding: 8px; border-radius: 5px; margin-top: 5px; cursor: pointer; }
+#form-status { text-align: center; margin-top: 10px; font-weight: bold; }

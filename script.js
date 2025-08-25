@@ -109,3 +109,61 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('slots-filter').addEventListener('change', applyFilters);
     document.getElementById('time-filter').addEventListener('change', applyFilters); // <-- Nuevo
 });
+
+// --- LÓGICA PARA EL FORMULARIO DE ALERTAS ---
+document.addEventListener('DOMContentLoaded', () => {
+    const alertForm = document.getElementById('alert-form');
+    if(alertForm) {
+        alertForm.addEventListener('submit', handleAlertFormSubmit);
+    }
+
+    const anyDateBtn = document.getElementById('any-date-btn');
+    if(anyDateBtn) {
+        anyDateBtn.addEventListener('click', () => {
+            const dateInput = document.getElementById('alert-fecha');
+            dateInput.value = ''; // Limpia el campo de fecha
+            alert('Fecha borrada. Se buscará en cualquier fecha.');
+        });
+    }
+});
+
+async function handleAlertFormSubmit(event) {
+    event.preventDefault(); // Evita que la página se recargue
+    const statusDiv = document.getElementById('form-status');
+    statusDiv.textContent = 'Guardando alerta...';
+    statusDiv.style.color = '#555';
+
+    const alertData = {
+        plazas: document.getElementById('alert-plazas').value,
+        fecha: document.getElementById('alert-fecha').value || 'cualquiera',
+        ubicacion: document.getElementById('alert-ubicacion').value,
+        horaInicio: document.getElementById('alert-hora-inicio').value,
+        horaFin: document.getElementById('alert-hora-fin').value,
+        nivel: document.getElementById('alert-nivel').value,
+        telegramId: document.getElementById('alert-telegram-id').value.trim()
+    };
+
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            // Google Apps Script requiere un formato especial para el body
+            body: JSON.stringify({
+                action: 'saveAlert',
+                data: alertData
+            })
+        });
+        const result = await response.json();
+
+        if (result.success) {
+            statusDiv.textContent = result.message;
+            statusDiv.style.color = '#28a745';
+            document.getElementById('alert-form').reset();
+        } else {
+            throw new Error(result.error);
+        }
+
+    } catch (error) {
+        statusDiv.textContent = `Error: ${error.message}`;
+        statusDiv.style.color = '#dc3545';
+    }
+}
