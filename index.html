@@ -16,9 +16,21 @@
     </header>
     <main>
         <div class="filters">
-            <input type="date" id="date-filter">
-            <input type="text" id="level-filter" placeholder="Filtrar por nivel (ej: 4.0)">
-        </div>
+    <input type="date" id="date-filter" title="Filtrar por fecha">
+    <select id="location-filter">
+        <option value="">Cualquier Club</option>
+        <option value="valencia">Valencia</option>
+        <option value="picaña">Picaña</option>
+    </select>
+    <select id="slots-filter">
+        <option value="">Plazas Libres</option>
+        <option value="1">Falta 1</option>
+        <option value="2">Faltan 2</option>
+        <option value="3">Faltan 3</option>
+        <option value="4">Pista Libre (4)</option>
+    </select>
+    <input type="text" id="level-filter" placeholder="Filtrar por nivel (ej: 4.0)">
+            </div>
         <div id="loader">Cargando partidas...</div>
         <div id="matches-container">
             </div>

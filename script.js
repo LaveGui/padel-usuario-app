@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchMatches();
     document.getElementById('date-filter').addEventListener('input', applyFilters);
     document.getElementById('level-filter').addEventListener('input', applyFilters);
+    document.getElementById('location-filter').addEventListener('change', applyFilters);
+    document.getElementById('slots-filter').addEventListener('change', applyFilters);
+
 });
 
 async function fetchMatches() {
@@ -72,12 +75,24 @@ function renderMatches(matches) {
 
 function applyFilters() {
     const dateFilter = document.getElementById('date-filter').value;
-    const levelFilter = document.getElementById('level-filter').value.trim();
+    const levelFilter = document.getElementById('level-filter').value.toLowerCase().trim();
+    const locationFilter = document.getElementById('location-filter').value;
+    const slotsFilter = document.getElementById('slots-filter').value;
 
     let filteredMatches = allMatches.filter(match => {
+        // Filtro por Fecha
         const dateMatch = !dateFilter || match.fecha === dateFilter;
-        const levelMatch = !levelFilter || match.jugadores.some(p => p.nivel && String(p.nivel).includes(levelFilter));
-        return dateMatch && levelMatch;
+
+        // Filtro por Club/Ubicación
+        const locationMatch = !locationFilter || (match.pista && match.pista.toLowerCase().includes(locationFilter));
+
+        // Filtro por Plazas Libres
+        const slotsMatch = !slotsFilter || match.plazas_libres >= parseInt(slotsFilter);
+
+        // Filtro por Nivel de Jugador
+        const levelMatch = !levelFilter || match.jugadores.some(p => p.nivel && String(p.nivel).toLowerCase().includes(levelFilter));
+
+        return dateMatch && locationMatch && slotsMatch && levelMatch;
     });
 
     renderMatches(filteredMatches);
