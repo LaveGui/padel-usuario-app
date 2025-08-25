@@ -5,14 +5,32 @@ const API_URL = "/api/data"; // Usaremos la misma ruta de proxy en Netlify
 
 let allMatches = [];
 
+// CORRECCIÓN: Unificamos toda la lógica de inicialización en un solo listener.
 document.addEventListener('DOMContentLoaded', () => {
+    // Inicialización del Tablón de Partidos
     fetchMatches();
     document.getElementById('date-filter').addEventListener('input', applyFilters);
     document.getElementById('level-filter').addEventListener('input', applyFilters);
     document.getElementById('location-filter').addEventListener('change', applyFilters);
     document.getElementById('slots-filter').addEventListener('change', applyFilters);
+    document.getElementById('time-filter').addEventListener('change', applyFilters);
 
+    // Inicialización del Formulario de Alertas
+    const alertForm = document.getElementById('alert-form');
+    if(alertForm) {
+        alertForm.addEventListener('submit', handleAlertFormSubmit);
+    }
+
+    const anyDateBtn = document.getElementById('any-date-btn');
+    if(anyDateBtn) {
+        anyDateBtn.addEventListener('click', () => {
+            const dateInput = document.getElementById('alert-fecha');
+            dateInput.value = ''; // Limpia el campo de fecha
+            dateInput.dispatchEvent(new Event('input')); // Para que los filtros se den cuenta
+        });
+    }
 });
+
 
 async function fetchMatches() {
     const loader = document.getElementById('loader');
@@ -42,7 +60,7 @@ function renderMatches(matches) {
     container.innerHTML = '';
 
     if (matches.length === 0) {
-        container.innerHTML = '<p style="text-align: center;">No hay partidas que coincidan con tu búsqueda.</p>';
+        container.innerHTML = '<p style="text-align: center; margin-top: 20px;">No hay partidas que coincidan con tu búsqueda.</p>';
         return;
     }
 
@@ -72,22 +90,22 @@ function renderMatches(matches) {
         container.appendChild(card);
     });
 }
+
 function applyFilters() {
     const dateFilter = document.getElementById('date-filter').value;
     const levelFilter = document.getElementById('level-filter').value.toLowerCase().trim();
     const locationFilter = document.getElementById('location-filter').value;
     const slotsFilter = document.getElementById('slots-filter').value;
-    const timeFilter = document.getElementById('time-filter').value; // <-- Nuevo
+    const timeFilter = document.getElementById('time-filter').value;
 
     let filteredMatches = allMatches.filter(match => {
         const dateMatch = !dateFilter || match.fecha === dateFilter;
         const locationMatch = !locationFilter || (match.pista && match.pista.toLowerCase().includes(locationFilter));
         const slotsMatch = !slotsFilter || match.plazas_libres >= parseInt(slotsFilter);
         const levelMatch = !levelFilter || match.jugadores.some(p => p.nivel && String(p.nivel).toLowerCase().includes(levelFilter));
-
-        // --- LÓGICA DEL FILTRO DE HORA ---
+        
         const horaMatch = !timeFilter || (()=>{
-            const hora = parseInt(match.hora.split(':')[0]);
+            const hora = parseInt(String(match.hora).split(':')[0]);
             if(timeFilter === 'mañana') return hora < 14;
             if(timeFilter === 'tarde') return hora >= 14 && hora < 18;
             if(timeFilter === 'noche') return hora >= 18;
@@ -100,35 +118,8 @@ function applyFilters() {
     renderMatches(filteredMatches);
 }
 
-// Reemplaza el listener completo para incluir el nuevo filtro
-document.addEventListener('DOMContentLoaded', () => {
-    fetchMatches();
-    document.getElementById('date-filter').addEventListener('input', applyFilters);
-    document.getElementById('level-filter').addEventListener('input', applyFilters);
-    document.getElementById('location-filter').addEventListener('change', applyFilters);
-    document.getElementById('slots-filter').addEventListener('change', applyFilters);
-    document.getElementById('time-filter').addEventListener('change', applyFilters); // <-- Nuevo
-});
-
-// --- LÓGICA PARA EL FORMULARIO DE ALERTAS ---
-document.addEventListener('DOMContentLoaded', () => {
-    const alertForm = document.getElementById('alert-form');
-    if(alertForm) {
-        alertForm.addEventListener('submit', handleAlertFormSubmit);
-    }
-
-    const anyDateBtn = document.getElementById('any-date-btn');
-    if(anyDateBtn) {
-        anyDateBtn.addEventListener('click', () => {
-            const dateInput = document.getElementById('alert-fecha');
-            dateInput.value = ''; // Limpia el campo de fecha
-            alert('Fecha borrada. Se buscará en cualquier fecha.');
-        });
-    }
-});
-
 async function handleAlertFormSubmit(event) {
-    event.preventDefault(); // Evita que la página se recargue
+    event.preventDefault();
     const statusDiv = document.getElementById('form-status');
     statusDiv.textContent = 'Guardando alerta...';
     statusDiv.style.color = '#555';
@@ -146,14 +137,13 @@ async function handleAlertFormSubmit(event) {
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
-            // Google Apps Script requiere un formato especial para el body
             body: JSON.stringify({
                 action: 'saveAlert',
                 data: alertData
             })
         });
         const result = await response.json();
-
+        
         if (result.success) {
             statusDiv.textContent = result.message;
             statusDiv.style.color = '#28a745';
