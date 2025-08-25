@@ -72,28 +72,40 @@ function renderMatches(matches) {
         container.appendChild(card);
     });
 }
-
 function applyFilters() {
     const dateFilter = document.getElementById('date-filter').value;
     const levelFilter = document.getElementById('level-filter').value.toLowerCase().trim();
     const locationFilter = document.getElementById('location-filter').value;
     const slotsFilter = document.getElementById('slots-filter').value;
+    const timeFilter = document.getElementById('time-filter').value; // <-- Nuevo
 
     let filteredMatches = allMatches.filter(match => {
-        // Filtro por Fecha
         const dateMatch = !dateFilter || match.fecha === dateFilter;
-
-        // Filtro por Club/Ubicación
         const locationMatch = !locationFilter || (match.pista && match.pista.toLowerCase().includes(locationFilter));
-
-        // Filtro por Plazas Libres
         const slotsMatch = !slotsFilter || match.plazas_libres >= parseInt(slotsFilter);
-
-        // Filtro por Nivel de Jugador
         const levelMatch = !levelFilter || match.jugadores.some(p => p.nivel && String(p.nivel).toLowerCase().includes(levelFilter));
 
-        return dateMatch && locationMatch && slotsMatch && levelMatch;
+        // --- LÓGICA DEL FILTRO DE HORA ---
+        const horaMatch = !timeFilter || (()=>{
+            const hora = parseInt(match.hora.split(':')[0]);
+            if(timeFilter === 'mañana') return hora < 14;
+            if(timeFilter === 'tarde') return hora >= 14 && hora < 18;
+            if(timeFilter === 'noche') return hora >= 18;
+            return true;
+        })();
+
+        return dateMatch && locationMatch && slotsMatch && levelMatch && horaMatch;
     });
 
     renderMatches(filteredMatches);
 }
+
+// Reemplaza el listener completo para incluir el nuevo filtro
+document.addEventListener('DOMContentLoaded', () => {
+    fetchMatches();
+    document.getElementById('date-filter').addEventListener('input', applyFilters);
+    document.getElementById('level-filter').addEventListener('input', applyFilters);
+    document.getElementById('location-filter').addEventListener('change', applyFilters);
+    document.getElementById('slots-filter').addEventListener('change', applyFilters);
+    document.getElementById('time-filter').addEventListener('change', applyFilters); // <-- Nuevo
+});
