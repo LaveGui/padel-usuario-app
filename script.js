@@ -5,31 +5,58 @@ const API_URL = "/api/data"; // Usaremos la misma ruta de proxy en Netlify
 
 let allMatches = [];
 
-// CORRECCIÓN: Unificamos toda la lógica de inicialización en un solo listener.
+// --- Listener Principal Unificado ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Inicialización del Tablón de Partidos
+    // Lógica de Pestañas
+    const tabs = document.querySelectorAll('.tab-button');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`tab-content-${tab.dataset.tab}`).classList.add('active');
+        });
+    });
+
+    // Lógica del Tablón de Partidos
     fetchMatches();
+    populateTimeFilters(); // <-- NUEVO: Llenamos los select de hora
     document.getElementById('date-filter').addEventListener('input', applyFilters);
     document.getElementById('level-filter').addEventListener('input', applyFilters);
     document.getElementById('location-filter').addEventListener('change', applyFilters);
-    document.getElementById('slots-filter').addEventListener('change', applyFilters);
-    document.getElementById('time-filter').addEventListener('change', applyFilters);
+    document.getElementById('time-from-filter').addEventListener('change', applyFilters); // <-- NUEVO
+    document.getElementById('time-to-filter').addEventListener('change', applyFilters); // <-- NUEVO
 
-    // Inicialización del Formulario de Alertas
+    // Lógica del Formulario de Alertas
     const alertForm = document.getElementById('alert-form');
     if(alertForm) {
         alertForm.addEventListener('submit', handleAlertFormSubmit);
     }
-
-    const anyDateBtn = document.getElementById('any-date-btn');
-    if(anyDateBtn) {
-        anyDateBtn.addEventListener('click', () => {
-            const dateInput = document.getElementById('alert-fecha');
-            dateInput.value = ''; // Limpia el campo de fecha
-            dateInput.dispatchEvent(new Event('input')); // Para que los filtros se den cuenta
-        });
-    }
 });
+
+function populateTimeFilters() {
+    const fromSelect = document.getElementById('time-from-filter');
+    const toSelect = document.getElementById('time-to-filter');
+    fromSelect.innerHTML = '<option value="">Desde...</option>';
+    toSelect.innerHTML = '<option value="">Hasta...</option>';
+
+    for (let h = 8; h <= 23; h++) {
+        for (let m = 0; m < 60; m += 30) {
+            if (h === 23 && m === 30) continue; // La última hora es 23:00
+
+            const hourStr = String(h).padStart(2, '0');
+            const minStr = String(m).padStart(2, '0');
+            const timeValue = `${hourStr}:${minStr}`;
+            
+            fromSelect.innerHTML += `<option value="${timeValue}">${timeValue}</option>`;
+            toSelect.innerHTML += `<option value="${timeValue}">${timeValue}</option>`;
+        }
+    }
+    toSelect.innerHTML += `<option value="23:30">23:30</option>`; // Añadimos la hora final
+}
 
 
 async function fetchMatches() {
@@ -95,28 +122,25 @@ function applyFilters() {
     const dateFilter = document.getElementById('date-filter').value;
     const levelFilter = document.getElementById('level-filter').value.toLowerCase().trim();
     const locationFilter = document.getElementById('location-filter').value;
-    const slotsFilter = document.getElementById('slots-filter').value;
-    const timeFilter = document.getElementById('time-filter').value;
+    const timeFromFilter = document.getElementById('time-from-filter').value;
+    const timeToFilter = document.getElementById('time-to-filter').value;
 
     let filteredMatches = allMatches.filter(match => {
         const dateMatch = !dateFilter || match.fecha === dateFilter;
         const locationMatch = !locationFilter || (match.pista && match.pista.toLowerCase().includes(locationFilter));
-        const slotsMatch = !slotsFilter || match.plazas_libres >= parseInt(slotsFilter);
         const levelMatch = !levelFilter || match.jugadores.some(p => p.nivel && String(p.nivel).toLowerCase().includes(levelFilter));
-        
-        const horaMatch = !timeFilter || (()=>{
-            const hora = parseInt(String(match.hora).split(':')[0]);
-            if(timeFilter === 'mañana') return hora < 14;
-            if(timeFilter === 'tarde') return hora >= 14 && hora < 18;
-            if(timeFilter === 'noche') return hora >= 18;
-            return true;
-        })();
 
-        return dateMatch && locationMatch && slotsMatch && levelMatch && horaMatch;
+        // Lógica de Hora Actualizada
+        const matchTime = match.hora;
+        const timeFromMatch = !timeFromFilter || matchTime >= timeFromFilter;
+        const timeToMatch = !timeToFilter || matchTime <= timeToFilter;
+        
+        return dateMatch && locationMatch && levelMatch && timeFromMatch && timeToMatch;
     });
 
     renderMatches(filteredMatches);
 }
+
 
 async function handleAlertFormSubmit(event) {
     event.preventDefault();
