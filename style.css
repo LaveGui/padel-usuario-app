@@ -294,3 +294,54 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     filter: invert(40%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(0%);
     opacity: 0.6;
 }
+
+/* --- Tarjetas --- */
+.card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    padding: 25px;
+    margin-bottom: 25px;
+}
+.card h2 { margin: 0 0 20px 0; text-align: center; }
+
+/* --- NUEVO: Vista Personalizada y Stats --- */
+.personalized-view { display: flex; flex-direction: column; gap: 8px; }
+.personalized-view label { font-weight: 600; text-align: center; color: var(--secondary-text-color); }
+#team-filter { padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 25px; font-size: 1.1em; font-family: var(--font-family); background-color: var(--bg-color); }
+.stats-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 20px; }
+.stat-card { background-color: var(--bg-color); padding: 15px; border-radius: 12px; text-align: center; }
+.stat-card span { display: block; font-size: 0.9em; color: var(--secondary-text-color); }
+.stat-card strong { display: block; font-size: 1.8em; font-weight: 700; color: var(--primary-color); }
+
+/* --- NUEVO: Tabla de Clasificación --- */
+.table-wrapper { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
+th { font-weight: 700; }
+tbody tr.highlight { background-color: #e8f8f5; }
+
+/* --- NUEVO: Lista de Partidos --- */
+.matches-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.section-title { font-size: 1.6em; font-weight: 700; margin: 0; }
+.match-item { background: #fff; border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; margin-bottom: 10px; display: grid; grid-template-columns: 1fr auto; gap: 15px; align-items: center; }
+.match-item.highlight { border-left: 4px solid var(--primary-color); }
+.match-teams { font-weight: 600; }
+.match-result { font-weight: 700; text-align: right; }
+.match-item.pending .match-result { color: var(--secondary-text-color); font-style: italic; cursor: pointer; }
+.match-item.pending:hover .match-result { color: var(--primary-hover); }
+
+/* --- Botones --- */
+.primary-button { background: var(--primary-color); color: #fff; border: none; padding: 12px 20px; font-size: 1em; font-weight: 700; border-radius: 30px; cursor: pointer; transition: background 0.2s; }
+.primary-button:hover { background: var(--primary-hover); }
+.primary-button.small { padding: 8px 15px; font-size: 0.9em; }
+
+/* --- NUEVO: Ventana Modal --- */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modal-content { background: #fff; padding: 30px; border-radius: 18px; width: 90%; max-width: 400px; position: relative; }
+.modal-close { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 2em; cursor: pointer; color: #aaa; }
+.modal-team-name { font-size: 1.2em; font-weight: 600; background-color: var(--bg-color); padding: 10px; border-radius: 12px; text-align: center; }
+#result-form { display: flex; flex-direction: column; gap: 15px; }
+#result-form-status { text-align: center; margin-top: 10px; font-weight: 600; }
+
+.hidden { display: none; }

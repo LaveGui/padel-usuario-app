@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Partidos de Pádel</title>
+    <title>Liga de Pádel</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,86 +12,91 @@
 <body>
     <div class="container">
         <header>
-            <h1>🎾 Portal de Pádel</h1>
+            <h1>🏆 Liga de Pádel 🏆</h1>
         </header>
         
         <div class="tabs">
-            <button class="tab-button active" data-tab="partidos">Buscar Partidos</button>
+            <button class="tab-button active" data-tab="liga">Liga</button>
+            <button class="tab-button" data-tab="partidos">Buscar Partidos</button>
             <button class="tab-button" data-tab="alertas">Crear Alerta</button>
         </div>
         
         <main>
-            <div id="tab-content-partidos" class="tab-content active">
-                <section class="card filter-card">
-                    <h2>Encuentra tu Match</h2>
-                    <div class="filters">
-                        <div class="form-group">
-                            <label for="date-filter">Fecha</label>
-                            <input type="date" id="date-filter" title="Filtrar por fecha">
-                        </div>
-                        <div class="form-group">
-                            <label for="location-filter">Club</label>
-                            <select id="location-filter">
-                                <option value="">Cualquier Club</option>
-                                <option value="valencia">Valencia</option>
-                                <option value="picaña">Picaña</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="time-from-filter">Desde las</label>
-                            <select id="time-from-filter"></select>
-                        </div>
-                        <div class="form-group">
-                            <label for="time-to-filter">Hasta las</label>
-                            <select id="time-to-filter"></select>
-                        </div>
-                         <div class="form-group full-width">
-                            <label for="level-filter">Nivel del Partido</label>
-                            <input type="text" id="level-filter" placeholder="Ej: 4.0, 4.25...">
-                        </div>
+            <div id="tab-content-liga" class="tab-content active">
+                <section class="card">
+                    <div class="personalized-view">
+                        <label for="team-filter">Ver mi pareja</label>
+                        <select id="team-filter">
+                            <option value="">Selecciona tu pareja...</option>
+                        </select>
+                    </div>
+                    <div class="stats-cards hidden" id="stats-cards-container">
+                        <div class="stat-card"><span>Posición</span><strong id="stat-posicion">#?</strong></div>
+                        <div class="stat-card"><span>Puntos</span><strong id="stat-puntos">?</strong></div>
+                        <div class="stat-card"><span>Partidos</span><strong id="stat-partidos">?/?</strong></div>
                     </div>
                 </section>
-                <section id="matches-section">
-                    <div id="loader">Cargando partidas...</div>
-                    <div id="matches-container"></div>
+
+                <section class="card">
+                    <h2>Clasificación</h2>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Pareja</th>
+                                    <th>PJ</th>
+                                    <th>Puntos</th>
+                                    <th>DS</th>
+                                    <th>DJ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="classification-table-body"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section>
+                    <div class="matches-header">
+                        <h2 class="section-title">Partidos</h2>
+                        <button id="add-result-main-btn" class="primary-button small">Añadir Resultado</button>
+                    </div>
+                    <div id="matches-list-container"></div>
                 </section>
             </div>
-            
+
+            <div id="tab-content-partidos" class="tab-content">
+                </div>
+
             <div id="tab-content-alertas" class="tab-content">
-                <section class="card alert-card">
-                    <h2>🔔 Crear una Alerta</h2>
-                    <p class="form-description">Recibe una notificación en Telegram cuando haya una partida que coincida con tus preferencias.</p>
-                    <form id="alert-form">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="alert-plazas">Me interesa cuando...</label>
-                                <select id="alert-plazas" required>
-                                    <option value="" disabled selected>Elige una opción...</option>
-                                    <option value="libre">Hay pista libre</option>
-                                    <option value="faltan">Faltan jugadores</option>
-                                    <option value="ambas">Ambas opciones</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="alert-ubicacion">Club</label>
-                                <select id="alert-ubicacion">
-                                    <option value="cualquiera">Cualquiera</option>
-                                    <option value="Valencia">Valencia</option>
-                                    <option value="Picaña">Picaña</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group final-step">
-                            <label for="alert-telegram-id">Tu ID de Chat de Telegram</label>
-                            <input type="text" id="alert-telegram-id" placeholder="ID numérico para recibir el aviso" required>
-                        </div>
-                        <button type="submit" class="primary-button">Crear Alerta</button>
-                        <div id="form-status"></div>
-                    </form>
-                </section>
-            </div>
+                 </div>
         </main>
     </div>
+
+    <div id="result-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close-btn">&times;</button>
+            <h2>Añadir Resultado</h2>
+            <form id="result-form">
+                <input type="hidden" id="match-id-input">
+                <div class="form-group">
+                    <label>Pareja 1</label>
+                    <p id="modal-team1-name" class="modal-team-name"></p>
+                </div>
+                <div class="form-group">
+                    <label>Pareja 2</label>
+                    <p id="modal-team2-name" class="modal-team-name"></p>
+                </div>
+                <div class="form-group">
+                    <label for="result-string">Resultado (ej: 6-4, 7-5)</label>
+                    <input type="text" id="result-string" placeholder="Separado por comas" required>
+                </div>
+                <button type="submit" class="primary-button">Guardar Resultado</button>
+                <div id="result-form-status"></div>
+            </form>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

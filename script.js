@@ -4,22 +4,30 @@ const API_URL = "/api/data"; // Usaremos la misma ruta de proxy en Netlify
 // --- LÓGICA DE LA APLICACIÓN ---
 
 let allMatches = [];
+let leagueData = {}; // Para la pestaña "Liga"
+
 
 // --- Listener Principal Unificado ---
+// --- Listener Principal Unificado ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Lógica de Pestañas
+    // --- Lógica de Pestañas ---
     const tabs = document.querySelectorAll('.tab-button');
+    const contents = document.querySelectorAll('.tab-content');
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
             tabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
-
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
+            contents.forEach(content => content.classList.remove('active'));
             document.getElementById(`tab-content-${tab.dataset.tab}`).classList.add('active');
         });
     });
+
+    // --- Inicialización de la Pestaña LIGA ---
+    fetchAndRenderLeague();
+    document.getElementById('team-filter').addEventListener('change', handleTeamSelection);
+    document.getElementById('add-result-main-btn').addEventListener('click', () => openResultModal());
+    document.getElementById('result-form').addEventListener('submit', submitMatchResult);
+    document.getElementById('modal-close-btn').addEventListener('click', () => document.getElementById('result-modal').classList.add('hidden'));
 
     // Lógica del Tablón de Partidos
     fetchMatches();
@@ -37,6 +45,151 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+
+async function fetchAndRenderLeague() {
+    // Aquí podrías añadir un loader específico para la liga
+    try {
+        const response = await fetch(`${API_URL}?endpoint=getLeagueData`);
+        const result = await response.json();
+        if (result.success) {
+            leagueData = result.data;
+            populateTeamFilter(leagueData.clasificacion);
+            renderClassificationTable(leagueData.clasificacion);
+            renderMatchesList(leagueData.partidos);
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (error) {
+        console.error("Error al cargar datos de la liga:", error);
+        // Aquí podrías mostrar un error en la UI
+    }
+}
+
+function populateTeamFilter(classification) {
+    const select = document.getElementById('team-filter');
+    select.innerHTML = '<option value="">Selecciona tu pareja...</option>';
+    classification.forEach(team => {
+        select.innerHTML += `<option value="${team.Numero}">${team.Pareja}</option>`;
+    });
+}
+
+function renderClassificationTable(classification) {
+    const tableBody = document.getElementById('classification-table-body');
+    tableBody.innerHTML = '';
+    classification.forEach((team, index) => {
+        const row = document.createElement('tr');
+        row.dataset.teamId = team.Numero;
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${team.Pareja}</td>
+            <td>${team.PJ}</td>
+            <td>${team.Puntos}</td>
+            <td>${team.DS}</td>
+            <td>${team.DJ}</td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+function renderMatchesList(matches) {
+    const container = document.getElementById('matches-list-container');
+    container.innerHTML = '';
+    matches.forEach(match => {
+        const matchEl = document.createElement('div');
+        matchEl.className = 'match-item';
+        matchEl.dataset.team1Id = match['Numero Pareja 1'];
+        matchEl.dataset.team2Id = match['Numero Pareja 2'];
+        
+        const teams = `<span>${match['Nombre Pareja 1']}</span> vs <span>${match['Nombre Pareja 2']}</span>`;
+        let resultHtml;
+
+        if (match.Estado === 'Jugado') {
+            resultHtml = `<div class="match-result">${match.Resultado}</div>`;
+        } else {
+            matchEl.classList.add('pending');
+            matchEl.dataset.matchId = match['ID Partido'];
+            resultHtml = `<div class="match-result">Añadir resultado</div>`;
+            matchEl.addEventListener('click', () => openResultModal(match['ID Partido'], match['Nombre Pareja 1'], match['Nombre Pareja 2']));
+        }
+        
+        matchEl.innerHTML = `<div class="match-teams">${teams}</div>${resultHtml}`;
+        container.appendChild(matchEl);
+    });
+}
+
+function handleTeamSelection(event) {
+    const selectedTeamId = event.target.value;
+    const statsContainer = document.getElementById('stats-cards-container');
+
+    // Limpiar highlights anteriores
+    document.querySelectorAll('#classification-table-body tr, .match-item').forEach(el => el.classList.remove('highlight'));
+    
+    if (!selectedTeamId) {
+        statsContainer.classList.add('hidden');
+        return;
+    }
+
+    // Mostrar highlights
+    document.querySelector(`#classification-table-body tr[data-team-id='${selectedTeamId}']`).classList.add('highlight');
+    document.querySelectorAll(`.match-item[data-team1-id='${selectedTeamId}'], .match-item[data-team2-id='${selectedTeamId}']`).forEach(el => el.classList.add('highlight'));
+
+    // Rellenar y mostrar tarjetas de stats
+    const teamData = leagueData.clasificacion.find(t => t.Numero == selectedTeamId);
+    const teamPosition = leagueData.clasificacion.findIndex(t => t.Numero == selectedTeamId) + 1;
+    if(teamData) {
+        document.getElementById('stat-posicion').textContent = `#${teamPosition}`;
+        document.getElementById('stat-puntos').textContent = teamData.Puntos;
+        document.getElementById('stat-partidos').textContent = `${teamData.PJ}/10`;
+        statsContainer.classList.remove('hidden');
+    }
+}
+
+function openResultModal(matchId = null, team1Name = '', team2Name = '') {
+    const modal = document.getElementById('result-modal');
+    document.getElementById('result-form').reset();
+    document.getElementById('result-form-status').textContent = '';
+    
+    // Si no se provee un ID, es un resultado "manual", no lo manejamos aún
+    if(!matchId) { 
+        alert("Por favor, añade el resultado haciendo clic en un partido pendiente.");
+        return;
+    }
+
+    document.getElementById('match-id-input').value = matchId;
+    document.getElementById('modal-team1-name').textContent = team1Name;
+    document.getElementById('modal-team2-name').textContent = team2Name;
+    
+    modal.classList.remove('hidden');
+}
+
+async function submitMatchResult(event) {
+    event.preventDefault();
+    const statusDiv = document.getElementById('result-form-status');
+    statusDiv.textContent = 'Guardando...';
+
+    const data = {
+        partidoId: document.getElementById('match-id-input').value,
+        resultadoStr: document.getElementById('result-string').value
+    };
+
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'addMatchResult', data: data })
+        });
+        const result = await response.json();
+        if (result.success) {
+            leagueData = result.data; // Actualizamos los datos con la respuesta del servidor
+            renderClassificationTable(leagueData.clasificacion);
+            renderMatchesList(leagueData.partidos);
+            document.getElementById('result-modal').classList.add('hidden');
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (error) {
+        statusDiv.textContent = `Error: ${error.message}`;
+    }
+}
 function populateTimeFilters() {
     const fromSelect = document.getElementById('time-from-filter');
     const toSelect = document.getElementById('time-to-filter');
