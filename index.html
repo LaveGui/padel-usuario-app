@@ -3,96 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Partidos Disponibles - Tu Padel</title>
+    <title>Partidos de Pádel</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <h1>🎾 Partidos Disponibles</h1>
-        <p>Encuentra tu próxima partida en Tu Padel Valencia y Picaña</p>
-    </header>
-    <main>
-        <div class="filters">
-            <input type="date" id="date-filter" title="Filtrar por fecha">
-            <select id="location-filter">
-                <option value="">Cualquier Club</option>
-                <option value="valencia">Valencia</option>
-                <option value="picaña">Picaña</option>
-            </select>
-            <select id="time-filter">
-                <option value="">Cualquier Hora</option>
-                <option value="mañana">Mañana (antes de 14:00)</option>
-                <option value="tarde">Tarde (14:00 - 18:00)</option>
-                <option value="noche">Noche (después de 18:00)</option>
-            </select>
-            <select id="slots-filter">
-                <option value="">Plazas Libres</option>
-                <option value="1">Falta 1</option>
-                <option value="2">Faltan 2</option>
-                <option value="3">Faltan 3</option>
-                <option value="4">Pista Libre (4)</option>
-            </select>
-            <input type="text" id="level-filter" placeholder="Filtrar por nivel (ej: 4.0)">
-        </div>
-
-        <section class="form-container">
-            <h2>🔔 Crear una Alerta de Partidos</h2>
-            <form id="alert-form">
-                <div class="form-grid">
+    <div class="container">
+        <header>
+            <h1>🎾 Partidos de Pádel</h1>
+            <p>Encuentra tu próxima partida en Valencia y crea alertas personalizadas.</p>
+        </header>
+        
+        <main>
+            <section class="card filter-card">
+                <h2>Encuentra tu Match</h2>
+                <div class="filters">
                     <div class="form-group">
-                        <label for="alert-plazas">Me interesa cuando...</label>
-                        <select id="alert-plazas" required>
-                            <option value="" disabled selected>Selecciona una opción...</option>
-                            <option value="libre">Hay una pista libre</option>
-                            <option value="faltan">Faltan jugadores</option>
-                            <option value="ambas">Cualquiera de las dos</option>
+                        <label for="date-filter">Fecha</label>
+                        <input type="date" id="date-filter" title="Filtrar por fecha">
+                    </div>
+                    <div class="form-group">
+                        <label for="location-filter">Club</label>
+                        <select id="location-filter">
+                            <option value="">Cualquier Club</option>
+                            <option value="valencia">Valencia</option>
+                            <option value="picaña">Picaña</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="alert-fecha">¿Para qué fecha?</label>
-                        <input type="date" id="alert-fecha">
-                        <button type="button" id="any-date-btn">Cualquier Fecha</button>
-                    </div>
-                    <div class="form-group">
-                        <label for="alert-ubicacion">¿En qué club?</label>
-                        <select id="alert-ubicacion">
-                            <option value="cualquiera">Cualquier Club</option>
-                            <option value="Valencia">Valencia</option>
-                            <option value="Picaña">Picaña</option>
+                        <label for="time-filter">Hora</label>
+                        <select id="time-filter">
+                            <option value="">Cualquier Hora</option>
+                            <option value="mañana">Mañana</option>
+                            <option value="tarde">Tarde</option>
+                            <option value="noche">Noche</option>
                         </select>
                     </div>
-                </div>
-                <div class="form-grid">
                     <div class="form-group">
-                        <label for="alert-hora-inicio">Horario (Desde)</label>
-                        <input type="time" id="alert-hora-inicio">
-                    </div>
-                    <div class="form-group">
-                        <label for="alert-hora-fin">Horario (Hasta)</label>
-                        <input type="time" id="alert-hora-fin">
-                    </div>
-                    <div class="form-group">
-                        <label for="alert-nivel">Nivel de Partido</label>
-                        <input type="text" id="alert-nivel" placeholder="Ej: 4.0, 4.25...">
+                        <label for="level-filter">Nivel</label>
+                        <input type="text" id="level-filter" placeholder="Ej: 4.0, 4.25...">
                     </div>
                 </div>
-                <hr>
-                <div class="form-group final-step">
-                    <label for="alert-telegram-id">Para guardar, introduce tu ID de Chat de Telegram</label>
-                    <input type="text" id="alert-telegram-id" placeholder="Tu ID numérico de Telegram" required>
-                </div>
-                <button type="submit">Guardar Alerta</button>
-                <div id="form-status"></div>
-            </form>
-        </section>
+            </section>
 
-        <div id="loader">Cargando partidas...</div>
-        <div id="matches-container">
-            </div>
-    </main>
+            <section id="matches-section">
+                <h2 class="section-title">Partidas Disponibles</h2>
+                <div id="loader">Cargando partidas...</div>
+                <div id="matches-container">
+                    </div>
+            </section>
+            
+            <section class="card alert-card">
+                <h2>🔔 Crear una Alerta</h2>
+                <p class="form-description">Recibe una notificación en Telegram cuando haya una partida que coincida con tus preferencias.</p>
+                <form id="alert-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="alert-plazas">Me interesa cuando...</label>
+                            <select id="alert-plazas" required>
+                                <option value="" disabled selected>Elige una opción...</option>
+                                <option value="libre">Hay pista libre</option>
+                                <option value="faltan">Faltan jugadores</option>
+                                <option value="ambas">Ambas opciones</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="alert-ubicacion">Club</label>
+                            <select id="alert-ubicacion">
+                                <option value="cualquiera">Cualquiera</option>
+                                <option value="Valencia">Valencia</option>
+                                <option value="Picaña">Picaña</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="alert-fecha">Fecha específica</label>
+                            <input type="date" id="alert-fecha">
+                        </div>
+                        <div class="form-group">
+                            <label for="alert-hora-inicio">Hora (desde)</label>
+                            <input type="time" id="alert-hora-inicio">
+                        </div>
+                        <div class="form-group">
+                            <label for="alert-hora-fin">Hora (hasta)</label>
+                            <input type="time" id="alert-hora-fin">
+                        </div>
+                        <div class="form-group">
+                            <label for="alert-nivel">Nivel deseado</label>
+                            <input type="text" id="alert-nivel" placeholder="Ej: 4.0">
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="form-group final-step">
+                        <label for="alert-telegram-id">Tu ID de Chat de Telegram</label>
+                        <input type="text" id="alert-telegram-id" placeholder="ID numérico para recibir el aviso" required>
+                        <p class="small-text">Encuentra tu ID enviando `/id` al bot de Telegram.</p>
+                    </div>
+                    <button type="submit" class="primary-button">Crear Alerta</button>
+                    <div id="form-status"></div>
+                </form>
+            </section>
+        </main>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
