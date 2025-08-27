@@ -1,15 +1,13 @@
 // CONFIGURACIÓN
-const API_URL = "/api/data"; // Usaremos la misma ruta de proxy en Netlify
+const API_URL = "/api/data"; 
 
-// --- LÓGICA DE LA APLICACIÓN ---
-
-let allMatches = [];
-let leagueData = {}; // Para la pestaña "Liga"
-
+// --- ALMACENES DE DATOS GLOBALES ---
+let allPublicMatches = []; // Almacena todas las partidas de la pestaña "Buscar Pista"
+let leagueData = {};     // Almacena todos los datos de la pestaña "Liga"
 
 // --- Listener Principal Unificado ---
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Lógica de Pestañas ---
+    // --- Lógica Común de Pestañas ---
     const tabs = document.querySelectorAll('.tab-button');
     const contents = document.querySelectorAll('.tab-content');
     tabs.forEach(tab => {
@@ -21,28 +19,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Inicialización de la Pestaña LIGA ---
+    // --- Inicialización de cada Pestaña ---
+    initLeagueTab();
+    initSearchTab();
+    initAlertsTab();
+});
+
+// ============================================================
+// ========= PESTAÑA "LIGA" ===================================
+// ============================================================
+function initLeagueTab() {
     document.getElementById('team-filter').addEventListener('change', handleTeamSelection);
     document.getElementById('result-form').addEventListener('submit', submitMatchResult);
     document.getElementById('modal-close-btn').addEventListener('click', () => document.getElementById('result-modal').classList.add('hidden'));
     fetchAndRenderLeague();
-
-    // Lógica del Tablón de Partidos
-    fetchMatches();
-    populateTimeFilters(); // <-- NUEVO: Llenamos los select de hora
-    document.getElementById('date-filter').addEventListener('input', applyFilters);
-    document.getElementById('level-filter').addEventListener('input', applyFilters);
-    document.getElementById('location-filter').addEventListener('change', applyFilters);
-    document.getElementById('time-from-filter').addEventListener('change', applyFilters); // <-- NUEVO
-    document.getElementById('time-to-filter').addEventListener('change', applyFilters); // <-- NUEVO
-
-    // Lógica del Formulario de Alertas
-    const alertForm = document.getElementById('alert-form');
-    if(alertForm) {
-        alertForm.addEventListener('submit', handleAlertFormSubmit);
-    }
-});
-
+}
 
 async function fetchAndRenderLeague() {
     try {
@@ -87,7 +78,6 @@ function renderClassificationTable(classification) {
     });
 }
 
-// Reemplaza esta función completa en tu script.js
 function renderMatchesList(matches) {
     const container = document.getElementById('matches-list-container');
     container.innerHTML = '';
@@ -97,20 +87,16 @@ function renderMatchesList(matches) {
         matchEl.dataset.team1Id = match['Numero Pareja 1'];
         matchEl.dataset.team2Id = match['Numero Pareja 2'];
         
-        // --- INICIO DE LA MEJORA VISUAL ---
         let team1Name = `<span>${match['Nombre Pareja 1']}</span>`;
         let team2Name = `<span>${match['Nombre Pareja 2']}</span>`;
 
-        // Usamos '==' para ser flexibles con tipos (número vs texto)
         if (match.ganador == 1) {
-            // Aplicamos negrita, color y el icono del trofeo al ganador
             team1Name = `<strong class="winner">🏆 ${match['Nombre Pareja 1']}</strong>`;
         } else if (match.ganador == 2) {
             team2Name = `<strong class="winner">🏆 ${match['Nombre Pareja 2']}</strong>`;
         }
         const teams = `${team1Name} vs ${team2Name}`;
-        // --- FIN DE LA MEJORA VISUAL ---
-
+        
         let resultHtml;
         if (match.Estado === 'Jugado') {
             resultHtml = `<div class="match-result">${match.Resultado}</div>`;
@@ -126,12 +112,10 @@ function renderMatchesList(matches) {
     });
 }
 
-
 function handleTeamSelection(event) {
     const selectedTeamId = event.target.value;
     const statsContainer = document.getElementById('stats-cards-container');
 
-    // Limpiar highlights anteriores
     document.querySelectorAll('#classification-table-body tr, .match-item').forEach(el => el.classList.remove('highlight'));
     
     if (!selectedTeamId) {
@@ -139,32 +123,24 @@ function handleTeamSelection(event) {
         return;
     }
 
-    // Mostrar highlights
     document.querySelector(`#classification-table-body tr[data-team-id='${selectedTeamId}']`).classList.add('highlight');
     document.querySelectorAll(`.match-item[data-team1-id='${selectedTeamId}'], .match-item[data-team2-id='${selectedTeamId}']`).forEach(el => el.classList.add('highlight'));
 
-    // Rellenar y mostrar tarjetas de stats
     const teamData = leagueData.clasificacion.find(t => t.Numero == selectedTeamId);
     const teamPosition = leagueData.clasificacion.findIndex(t => t.Numero == selectedTeamId) + 1;
     if(teamData) {
         document.getElementById('stat-posicion').textContent = `#${teamPosition}`;
         document.getElementById('stat-puntos').textContent = teamData.Puntos;
-        document.getElementById('stat-partidos').textContent = `${teamData.PJ}/10`;
+        document.getElementById('stat-partidos').textContent = `${teamData.PJ}/10`; // Asumiendo 10 partidos
         statsContainer.classList.remove('hidden');
     }
 }
 
-function openResultModal(matchId = null, team1Name = '', team2Name = '') {
+function openResultModal(matchId, team1Name, team2Name) {
     const modal = document.getElementById('result-modal');
     document.getElementById('result-form').reset();
     document.getElementById('result-form-status').textContent = '';
     
-    // Si no se provee un ID, es un resultado "manual", no lo manejamos aún
-    if(!matchId) { 
-        alert("Por favor, añade el resultado haciendo clic en un partido pendiente.");
-        return;
-    }
-
     document.getElementById('match-id-input').value = matchId;
     document.getElementById('modal-team1-name').textContent = team1Name;
     document.getElementById('modal-team2-name').textContent = team2Name;
@@ -172,22 +148,17 @@ function openResultModal(matchId = null, team1Name = '', team2Name = '') {
     modal.classList.remove('hidden');
 }
 
-
 async function submitMatchResult(event) {
     event.preventDefault();
     const statusDiv = document.getElementById('result-form-status');
     statusDiv.textContent = 'Guardando...';
     statusDiv.style.color = '#555';
 
-    // Leer los datos del nuevo formulario
     const data = {
         partidoId: document.getElementById('match-id-input').value,
-        set1_p1: document.getElementById('set1_p1').value,
-        set1_p2: document.getElementById('set1_p2').value,
-        set2_p1: document.getElementById('set2_p1').value,
-        set2_p2: document.getElementById('set2_p2').value,
-        set3_p1: document.getElementById('set3_p1').value,
-        set3_p2: document.getElementById('set3_p2').value,
+        set1_p1: document.getElementById('set1_p1').value, set1_p2: document.getElementById('set1_p2').value,
+        set2_p1: document.getElementById('set2_p1').value, set2_p2: document.getElementById('set2_p2').value,
+        set3_p1: document.getElementById('set3_p1').value, set3_p2: document.getElementById('set3_p2').value,
     };
 
     try {
@@ -197,7 +168,7 @@ async function submitMatchResult(event) {
         });
         const result = await response.json();
         if (result.success) {
-            leagueData = result.data;
+            leagueData = result.data; // Actualizamos los datos de la liga
             renderClassificationTable(leagueData.clasificacion);
             renderMatchesList(leagueData.partidos);
             document.getElementById('result-modal').classList.add('hidden');
@@ -210,14 +181,12 @@ async function submitMatchResult(event) {
     }
 }
 
+
 // ============================================================
-// ========= LÓGICA DE LA PESTAÑA "BUSCAR PISTA" ============
+// ========= PESTAÑA "BUSCAR PISTA" ===========================
 // ============================================================
 
-function initMatchesTab() {
-    hasLoadedMatches = true;
-    console.log("Inicializando pestaña 'Buscar Pista'...");
-
+function initSearchTab() {
     // Poblar los filtros con valores dinámicos
     populateDateFilters();
     populateTimeFilters();
@@ -230,7 +199,7 @@ function initMatchesTab() {
         applyMatchesFilter();
     });
 
-    // Cargar los datos de las partidas
+    // Cargar los datos de las partidas una sola vez
     fetchPublicMatches();
 }
 
@@ -247,8 +216,6 @@ function populateDateFilters() {
     toDate.value = formatDate(maxDate);
     fromDate.min = formatDate(today);
     toDate.min = formatDate(today);
-    fromDate.max = formatDate(maxDate);
-    toDate.max = formatDate(maxDate);
 }
 
 function populateTimeFilters() {
@@ -298,13 +265,14 @@ async function fetchPublicMatches() {
             throw new Error(result.error);
         }
     } catch (error) {
-        document.getElementById('matches-container').innerHTML = `<p style="color: red; text-align: center;">${error.message}</p>`;
+        document.getElementById('search-results-container').innerHTML = `<p style="color: red; text-align: center;">${error.message}</p>`;
     } finally {
         loader.classList.add('hidden');
     }
 }
 
 function applyMatchesFilter() {
+    // 1. Leer todos los valores de los filtros
     const fromDate = document.getElementById('date-from-filter').value;
     const toDate = document.getElementById('date-to-filter').value;
     const fromTime = document.getElementById('time-from-filter').value;
@@ -314,117 +282,83 @@ function applyMatchesFilter() {
     const level = document.getElementById('level-filter').value;
 
     const loader = document.getElementById('loader');
+    const container = document.getElementById('search-results-container');
     loader.classList.remove('hidden');
-    document.getElementById('matches-container').innerHTML = '';
+    container.innerHTML = '';
 
-    // Simulamos una pequeña demora para que el loader sea visible
-    setTimeout(() => {
+    // 2. Filtrar el array `allPublicMatches`
+    setTimeout(() => { // Simulamos una pequeña demora para que el loader sea visible
         const filtered = allPublicMatches.filter(match => {
-            // Lógica de filtrado
             if (fromDate && match.fecha < fromDate) return false;
             if (toDate && match.fecha > toDate) return false;
             if (fromTime && match.hora < fromTime) return false;
             if (toTime && match.hora > toTime) return false;
             if (location && !match.pista.toLowerCase().includes(location)) return false;
-
             if (searchType === 'libre' && match.plazas_libres !== 4) return false;
             if (searchType === 'faltan' && match.plazas_libres === 4) return false;
 
             if ((searchType === 'faltan' || searchType === 'ambas') && level) {
-                if (!match.jugadores.some(p => p.nivel == level)) return false;
+                 if (match.jugadores.length === 0) return false; // Si no hay jugadores, no podemos filtrar por nivel
+                 if (!match.jugadores.some(p => p.nivel == level)) return false;
             }
-
             return true;
         });
 
+        // 3. Renderizar los resultados
         renderFilteredMatches(filtered);
         loader.classList.add('hidden');
-    }, 250); // 250 milisegundos
-}
-
-
-async function fetchMatches() {
-    const loader = document.getElementById('loader');
-    const container = document.getElementById('matches-container');
-    loader.style.display = 'block';
-    container.innerHTML = '';
-
-    try {
-        const response = await fetch(`${API_URL}?endpoint=getPublicMatches`);
-        const result = await response.json();
-
-        if (result.success && result.data) {
-            allMatches = result.data;
-            renderMatches(allMatches);
-        } else {
-            throw new Error(result.error || 'No se pudieron cargar las partidas.');
-        }
-    } catch (error) {
-        container.innerHTML = `<p style="color: red; text-align: center;">${error.message}</p>`;
-    } finally {
-        loader.style.display = 'none';
-    }
+    }, 250);
 }
 
 function renderFilteredMatches(matches) {
-    const container = document.getElementById('matches-container');
+    const container = document.getElementById('search-results-container');
     container.innerHTML = '';
 
     if (matches.length === 0) {
-        container.innerHTML = '<p style="text-align: center; margin-top: 20px;">No hay partidas que coincidan con tu búsqueda.</p>';
+        container.innerHTML = '<p class="placeholder-text">No se han encontrado partidas que coincidan con tu búsqueda.</p>';
         return;
     }
 
     matches.forEach(match => {
         const card = document.createElement('div');
-        card.className = 'match-card';
+        card.className = 'card'; // Reutilizamos el estilo de 'card'
         
         const fecha = new Date(match.fecha + 'T00:00:00');
         const fechaStr = fecha.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
 
-        let playersHtml = '<h3>Jugadores Apuntados:</h3>';
+        let playersHtml = '';
         if (match.jugadores.length > 0) {
-            match.jugadores.forEach(p => {
-                playersHtml += `<div class="player">${p.nombre} (Nivel: ${p.nivel || 'N/A'})</div>`;
-            });
+            playersHtml = `
+                <p><strong>Jugadores Apuntados:</strong></p>
+                <ul>
+                    ${match.jugadores.map(p => `<li>${p.nombre} (Nivel: ${p.nivel || 'N/A'})</li>`).join('')}
+                </ul>`;
         } else {
-            playersHtml += '<div class="player">¡Sé el primero en apuntarte!</div>';
+            playersHtml = '<p>¡Sé el primero en apuntarte!</p>';
         }
+        
+        let statusText = match.plazas_libres === 4 ? `✅ <b>Pista Libre</b>` : `🔥 <b>¡Faltan ${match.plazas_libres}!</b>`;
 
         card.innerHTML = `
-            <h2>${match.pista}</h2>
-            <div class="info"><strong>Fecha:</strong> ${fechaStr}</div>
-            <div class="info"><strong>Hora:</strong> ${match.hora}</div>
-            <div class="status">🔥 ¡Quedan ${match.plazas_libres} plazas libres!</div>
-            <div class="players-list">${playersHtml}</div>
+            <h3>${match.pista}</h3>
+            <p><strong>${fechaStr}</strong> a las <strong>${match.hora}hs</strong></p>
+            <p>${statusText}</p>
+            ${playersHtml}
         `;
         container.appendChild(card);
     });
 }
 
-function applyFilters() {
-    const dateFilter = document.getElementById('date-filter').value;
-    const levelFilter = document.getElementById('level-filter').value.toLowerCase().trim();
-    const locationFilter = document.getElementById('location-filter').value;
-    const timeFromFilter = document.getElementById('time-from-filter').value;
-    const timeToFilter = document.getElementById('time-to-filter').value;
+// ============================================================
+// ========= PESTAÑA "CREAR ALERTA" ===========================
+// ============================================================
 
-    let filteredMatches = allMatches.filter(match => {
-        const dateMatch = !dateFilter || match.fecha === dateFilter;
-        const locationMatch = !locationFilter || (match.pista && match.pista.toLowerCase().includes(locationFilter));
-        const levelMatch = !levelFilter || match.jugadores.some(p => p.nivel && String(p.nivel).toLowerCase().includes(levelFilter));
-
-        // Lógica de Hora Actualizada
-        const matchTime = match.hora;
-        const timeFromMatch = !timeFromFilter || matchTime >= timeFromFilter;
-        const timeToMatch = !timeToFilter || matchTime <= timeToFilter;
-        
-        return dateMatch && locationMatch && levelMatch && timeFromMatch && timeToMatch;
-    });
-
-    renderMatches(filteredMatches);
+function initAlertsTab() {
+    const alertForm = document.getElementById('alert-form');
+    if (alertForm) {
+        alertForm.addEventListener('submit', handleAlertFormSubmit);
+    }
 }
-
 
 async function handleAlertFormSubmit(event) {
     event.preventDefault();
@@ -432,23 +366,17 @@ async function handleAlertFormSubmit(event) {
     statusDiv.textContent = 'Guardando alerta...';
     statusDiv.style.color = '#555';
 
+    // Simplificamos la recolección de datos
     const alertData = {
         plazas: document.getElementById('alert-plazas').value,
-        fecha: document.getElementById('alert-fecha').value || 'cualquiera',
         ubicacion: document.getElementById('alert-ubicacion').value,
-        horaInicio: document.getElementById('alert-hora-inicio').value,
-        horaFin: document.getElementById('alert-hora-fin').value,
-        nivel: document.getElementById('alert-nivel').value,
         telegramId: document.getElementById('alert-telegram-id').value.trim()
     };
 
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
-            body: JSON.stringify({
-                action: 'saveAlert',
-                data: alertData
-            })
+            body: JSON.stringify({ action: 'saveAlert', data: alertData })
         });
         const result = await response.json();
         
@@ -459,7 +387,6 @@ async function handleAlertFormSubmit(event) {
         } else {
             throw new Error(result.error);
         }
-
     } catch (error) {
         statusDiv.textContent = `Error: ${error.message}`;
         statusDiv.style.color = '#dc3545';

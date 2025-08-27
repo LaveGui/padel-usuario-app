@@ -12,12 +12,12 @@
 <body>
     <div class="container">
         <header>
-            <h1>🏆 Liga de Pádel 🏆</h1>
+            <h1>🏆 Ecosistema de Pádel 🏆</h1>
         </header>
         
         <div class="tabs">
             <button class="tab-button active" data-tab="liga">Liga</button>
-            <button class="tab-button" data-tab="partidos">Buscar Partidos</button>
+            <button class="tab-button" data-tab="partidos">Buscar Pista</button>
             <button class="tab-button" data-tab="alertas">Crear Alerta</button>
         </div>
         
@@ -36,7 +36,6 @@
                         <div class="stat-card"><span>Partidos</span><strong id="stat-partidos">?/?</strong></div>
                     </div>
                 </section>
-
                 <section class="card">
                     <h2>Clasificación</h2>
                     <div class="table-wrapper">
@@ -55,11 +54,9 @@
                         </table>
                     </div>
                 </section>
-
                 <section>
                     <div class="matches-header">
                         <h2 class="section-title">Partidos</h2>
-                        <button id="add-result-main-btn" class="primary-button small" disabled title="Añade el resultado desde un partido pendiente">Añadir Resultado</button>
                     </div>
                     <div id="matches-list-container"></div>
                 </section>
@@ -97,37 +94,37 @@
                             <div class="form-group">
                                 <label for="search-type-filter">Tipo de Búsqueda</label>
                                 <select id="search-type-filter">
+                                    <option value="ambas">Ambas</option>
                                     <option value="libre">Pista Libre</option>
                                     <option value="faltan">Faltan Jugadores</option>
-                                    <option value="ambas">Ambas</option>
                                 </select>
                             </div>
                             <div class="form-group hidden" id="level-filter-container">
                                 <label for="level-filter">Nivel del Partido</label>
                                 <select id="level-filter">
                                     <option value="">Cualquier Nivel</option>
-                                    </select>
+                                </select>
                             </div>
                         </div>
                         <button type="submit" class="primary-button">Buscar Pistas</button>
                     </form>
                 </section>
-                <section id="matches-section">
+                <section id="search-results-section">
                     <div id="loader" class="hidden">Cargando...</div>
-                    <div id="matches-container">
+                    <div id="search-results-container">
                         <p class="placeholder-text">Usa los filtros y pulsa "Buscar Pistas" para ver los resultados.</p>
                     </div>
                 </section>
             </div>
 
             <div id="tab-content-alertas" class="tab-content">
-                <section class="card alert-card">
+                 <section class="card alert-card">
                     <h2>🔔 Crear una Alerta</h2>
                     <p class="form-description">Recibe una notificación en Telegram cuando haya una partida que coincida con tus preferencias.</p>
                     <form id="alert-form">
                         <div class="form-grid">
-                            <div class="form-group"><label for="alert-plazas">Me interesa cuando...</label><select id="alert-plazas" required><option value="" disabled selected>Elige una opción...</option><option value="libre">Hay pista libre</option><option value="faltan">Faltan jugadores</option><option value="ambas">Ambas opciones</option></select></div>
-                            <div class="form-group"><label for="alert-ubicacion">Club</label><select id="alert-ubicacion"><option value="cualquiera">Cualquiera</option><option value="Valencia">Valencia</option><option value="Picaña">Picaña</option></select></div>
+                             <div class="form-group"><label for="alert-plazas">Me interesa cuando...</label><select id="alert-plazas" required><option value="" disabled selected>Elige una opción...</option><option value="libre">Hay pista libre</option><option value="faltan">Faltan jugadores</option><option value="ambas">Ambas opciones</option></select></div>
+                             <div class="form-group"><label for="alert-ubicacion">Club</label><select id="alert-ubicacion"><option value="cualquiera">Cualquiera</option><option value="valencia">Valencia</option><option value="picaña">Picaña</option></select></div>
                         </div>
                         <div class="form-group final-step">
                             <label for="alert-telegram-id">Tu ID de Chat de Telegram</label>
@@ -141,33 +138,33 @@
         </main>
     </div>
 
-        <div id="result-modal" class="modal-overlay hidden">
-    <div class="modal-content">
-        <button class="modal-close" id="modal-close-btn">&times;</button>
-        <h2>Añadir Resultado</h2>
-        <form id="result-form">
-            <input type="hidden" id="match-id-input">
-            <div class="result-grid">
-                <div></div> <div id="modal-team1-name" class="team-header"></div>
-                <div id="modal-team2-name" class="team-header"></div>
-                
-                <label for="set1_p1" class="set-label">Set 1</label>
-                <input type="number" id="set1_p1" class="score-input" min="0" max="10">
-                <input type="number" id="set1_p2" class="score-input" min="0" max="10">
+    <div id="result-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close-btn">&times;</button>
+            <h2>Añadir Resultado</h2>
+            <form id="result-form">
+                <input type="hidden" id="match-id-input">
+                <div class="result-grid">
+                    <div></div> <div id="modal-team1-name" class="team-header"></div>
+                    <div id="modal-team2-name" class="team-header"></div>
+                    
+                    <label for="set1_p1" class="set-label">Set 1</label>
+                    <input type="number" id="set1_p1" class="score-input" min="0" max="10">
+                    <input type="number" id="set1_p2" class="score-input" min="0" max="10">
 
-                <label for="set2_p1" class="set-label">Set 2</label>
-                <input type="number" id="set2_p1" class="score-input" min="0" max="10">
-                <input type="number" id="set2_p2" class="score-input" min="0" max="10">
+                    <label for="set2_p1" class="set-label">Set 2</label>
+                    <input type="number" id="set2_p1" class="score-input" min="0" max="10">
+                    <input type="number" id="set2_p2" class="score-input" min="0" max="10">
 
-                <label for="set3_p1" class="set-label">Set 3 (si aplica)</label>
-                <input type="number" id="set3_p1" class="score-input" min="0" max="20">
-                <input type="number" id="set3_p2" class="score-input" min="0" max="20">
-            </div>
-            <button type="submit" class="primary-button">Guardar Resultado</button>
-            <div id="result-form-status"></div>
-        </form>
-    </div>
+                    <label for="set3_p1" class="set-label">Set 3 (si aplica)</label>
+                    <input type="number" id="set3_p1" class="score-input" min="0" max="20">
+                    <input type="number" id="set3_p2" class="score-input" min="0" max="20">
+                </div>
+                <button type="submit" class="primary-button">Guardar Resultado</button>
+                <div id="result-form-status"></div>
+            </form>
         </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
