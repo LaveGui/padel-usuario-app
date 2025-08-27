@@ -4,6 +4,8 @@ const API_URL = "/api/data";
 // --- ALMACENES DE DATOS GLOBALES ---
 let allPublicMatches = []; // Almacena todas las partidas de la pestaña "Buscar Pista"
 let leagueData = {};     // Almacena todos los datos de la pestaña "Liga"
+let currentZone = 'A'; // NUEVO: Variable para saber la zona activa. Por defecto 'A'.
+
 
 // --- Listener Principal Unificado ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -32,6 +34,15 @@ function initLeagueTab() {
     document.getElementById('team-filter').addEventListener('change', handleTeamSelection);
     document.getElementById('result-form').addEventListener('submit', submitMatchResult);
     document.getElementById('modal-close-btn').addEventListener('click', () => document.getElementById('result-modal').classList.add('hidden'));
+    
+    // NUEVO: Listeners para los botones de zona
+    document.querySelectorAll('.zone-button').forEach(button => {
+        button.addEventListener('click', () => {
+            currentZone = button.dataset.zone;
+            renderZoneView(); // Renderizamos la vista de la zona seleccionada
+        });
+    });
+
     fetchAndRenderLeague();
 }
 
@@ -42,8 +53,7 @@ async function fetchAndRenderLeague() {
         if (result.success) {
             leagueData = result.data;
             populateTeamFilter(leagueData.clasificacion);
-            renderClassificationTable(leagueData.clasificacion);
-            renderMatchesList(leagueData.partidos);
+            renderZoneView(); // Renderizamos la vista por defecto (Zona A)
         } else {
             throw new Error(result.error);
         }
@@ -51,6 +61,23 @@ async function fetchAndRenderLeague() {
         console.error("Error al cargar datos de la liga:", error);
     }
 }
+
+// NUEVA FUNCIÓN: Encapsula la lógica de renderizado por zona
+function renderZoneView() {
+    // Actualizar el estado visual de los botones
+    document.querySelectorAll('.zone-button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.zone === currentZone);
+    });
+
+    // Filtrar y renderizar la clasificación
+    const filteredClassification = leagueData.clasificacion.filter(team => team.Zona === currentZone);
+    renderClassificationTable(filteredClassification);
+
+    // Filtrar y renderizar los partidos
+    const filteredMatches = leagueData.partidos.filter(match => match.Zona === currentZone);
+    renderMatchesList(filteredMatches);
+}
+
 
 function populateTeamFilter(classification) {
     const select = document.getElementById('team-filter');
@@ -60,7 +87,7 @@ function populateTeamFilter(classification) {
     });
 }
 
-function renderClassificationTable(classification) {
+function renderClassificationTable(classification) { // La función ahora recibe datos ya filtrados
     const tableBody = document.getElementById('classification-table-body');
     tableBody.innerHTML = '';
     classification.forEach((team, index) => {
@@ -78,10 +105,11 @@ function renderClassificationTable(classification) {
     });
 }
 
-function renderMatchesList(matches) {
+function renderMatchesList(matches) { // La función ahora recibe datos ya filtrados
     const container = document.getElementById('matches-list-container');
     container.innerHTML = '';
     matches.forEach(match => {
+        // ... (el interior de esta función no cambia, solo recibe menos datos)
         const matchEl = document.createElement('div');
         matchEl.className = 'match-item';
         matchEl.dataset.team1Id = match['Numero Pareja 1'];
@@ -112,10 +140,12 @@ function renderMatchesList(matches) {
     });
 }
 
+
 function handleTeamSelection(event) {
     const selectedTeamId = event.target.value;
     const statsContainer = document.getElementById('stats-cards-container');
-
+    
+    // Limpiamos highlights anteriores
     document.querySelectorAll('#classification-table-body tr, .match-item').forEach(el => el.classList.remove('highlight'));
     
     if (!selectedTeamId) {
@@ -123,18 +153,35 @@ function handleTeamSelection(event) {
         return;
     }
 
-    document.querySelector(`#classification-table-body tr[data-team-id='${selectedTeamId}']`).classList.add('highlight');
-    document.querySelectorAll(`.match-item[data-team1-id='${selectedTeamId}'], .match-item[data-team2-id='${selectedTeamId}']`).forEach(el => el.classList.add('highlight'));
-
+    // LÓGICA DE CAMBIO AUTOMÁTICO DE ZONA
     const teamData = leagueData.clasificacion.find(t => t.Numero == selectedTeamId);
-    const teamPosition = leagueData.clasificacion.findIndex(t => t.Numero == selectedTeamId) + 1;
-    if(teamData) {
-        document.getElementById('stat-posicion').textContent = `#${teamPosition}`;
-        document.getElementById('stat-puntos').textContent = teamData.Puntos;
-        document.getElementById('stat-partidos').textContent = `${teamData.PJ}/10`; // Asumiendo 10 partidos
-        statsContainer.classList.remove('hidden');
+    if (teamData && teamData.Zona !== currentZone) {
+        currentZone = teamData.Zona;
+        renderZoneView(); // Si la pareja es de otra zona, la mostramos
     }
+    
+    // Esperamos un instante para que el DOM se actualice con la nueva zona si ha cambiado
+    setTimeout(() => {
+        // Rellenar y mostrar tarjetas de stats
+        const teamPosition = leagueData.clasificacion
+            .filter(t => t.Zona === currentZone)
+            .findIndex(t => t.Numero == selectedTeamId) + 1;
+        
+        if(teamData) {
+            document.getElementById('stat-posicion').textContent = `#${teamPosition}`;
+            document.getElementById('stat-puntos').textContent = teamData.Puntos;
+            document.getElementById('stat-partidos').textContent = `${teamData.PJ}/10`; // Asumiendo 10 partidos
+            statsContainer.classList.remove('hidden');
+        }
+
+        // Mostrar highlights en la zona correcta
+        document.querySelector(`#classification-table-body tr[data-team-id='${selectedTeamId}']`)?.classList.add('highlight');
+        document.querySelectorAll(`.match-item[data-team1-id='${selectedTeamId}'], .match-item[data-team2-id='${selectedTeamId}']`).forEach(el => el.classList.add('highlight'));
+    }, 100); // Pequeña demora para asegurar que la vista se ha renderizado
 }
+
+
+
 
 function openResultModal(matchId, team1Name, team2Name) {
     const modal = document.getElementById('result-modal');

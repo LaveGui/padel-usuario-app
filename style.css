@@ -352,3 +352,28 @@ tbody tr.highlight {
 .hidden { 
     display: none !important; 
 }
+
+.zone-selector {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.zone-button {
+    padding: 8px 20px;
+    border: 1px solid var(--border-color);
+    background-color: transparent;
+    color: var(--secondary-text-color);
+    font-family: var(--font-family);
+    font-weight: 600;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.zone-button.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
