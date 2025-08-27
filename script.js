@@ -209,15 +209,23 @@ function handleTeamSelection(event) {
     
     // Esperamos un instante para que el DOM se actualice con la nueva zona si ha cambiado
     setTimeout(() => {
+        const teamsInCurrentZone = leagueData.clasificacion.filter(t => t.Zona === currentZone);
+        
         // Rellenar y mostrar tarjetas de stats
-        const teamPosition = leagueData.clasificacion
-            .filter(t => t.Zona === currentZone)
-            .findIndex(t => t.Numero == selectedTeamId) + 1;
+        const teamPosition = teamsInCurrentZone.findIndex(t => t.Numero == selectedTeamId) + 1;
         
         if(teamData) {
+            // ======== INICIO DE LA CORRECCIÓN ========
+            // Calculamos el total de partidos dinámicamente.
+            // En una liguilla, cada pareja juega contra todos los demás (n-1 partidos).
+            const totalMatchesForZone = teamsInCurrentZone.length - 1;
+            
             document.getElementById('stat-posicion').textContent = `#${teamPosition}`;
             document.getElementById('stat-puntos').textContent = teamData.Puntos;
-            document.getElementById('stat-partidos').textContent = `${teamData.PJ}/10`; // Asumiendo 10 partidos
+            // Usamos la nueva variable en lugar del valor fijo '10'
+            document.getElementById('stat-partidos').textContent = `${teamData.PJ}/${totalMatchesForZone}`;
+            // ======== FIN DE LA CORRECCIÓN ========
+
             statsContainer.classList.remove('hidden');
         }
 
@@ -333,8 +341,8 @@ function populateTimeFilters() {
     toSelect.innerHTML += `<option value="23:30">23:30</option>`;
 }
 
-function populateLevelFilter() {
-    const select = document.getElementById('level-filter');
+function populateLevelFilter(selectId = 'level-filter') {
+    const select = document.getElementById(selectId);
     const levels = ["3.75", "3.90", "4.0", "4.10", "4.20", "4.25", "4.30", "4.35"];
     levels.forEach(level => {
         select.innerHTML += `<option value="${level}">${level}</option>`;
@@ -494,6 +502,21 @@ function renderFilteredMatches(matches) {
 // ============================================================
 
 function initAlertsTab() {
+    // Reutilizamos las funciones que ya creamos para poblar los filtros
+    populateTimeFilters('alert-hora-inicio', 'alert-hora-fin');
+    populateLevelFilter('alert-nivel');
+    
+    // Lógica para mostrar/ocultar el filtro de nivel
+    document.getElementById('alert-plazas').addEventListener('change', () => {
+        const searchType = document.getElementById('alert-plazas').value;
+        const levelContainer = document.getElementById('alert-level-container');
+        if (searchType === 'faltan' || searchType === 'ambas') {
+            levelContainer.classList.remove('hidden');
+        } else {
+            levelContainer.classList.add('hidden');
+        }
+    });
+
     const alertForm = document.getElementById('alert-form');
     if (alertForm) {
         alertForm.addEventListener('submit', handleAlertFormSubmit);
@@ -503,32 +526,58 @@ function initAlertsTab() {
 async function handleAlertFormSubmit(event) {
     event.preventDefault();
     const statusDiv = document.getElementById('form-status');
+    const form = event.target;
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    const telegramId = document.getElementById('alert-telegram-id').value.trim();
+    const email = document.getElementById('alert-email').value.trim();
+
+    if (!telegramId && !email) {
+        statusDiv.textContent = 'Error: Debes proporcionar un ID de Telegram o un Email.';
+        statusDiv.style.color = '#dc3545';
+        return;
+    }
+
     statusDiv.textContent = 'Guardando alerta...';
     statusDiv.style.color = '#555';
+    submitButton.disabled = true;
 
-    // Simplificamos la recolección de datos
     const alertData = {
         plazas: document.getElementById('alert-plazas').value,
+        fecha: document.getElementById('alert-fecha').value || 'cualquiera',
+        horaInicio: document.getElementById('alert-hora-inicio').value,
+        horaFin: document.getElementById('alert-hora-fin').value,
         ubicacion: document.getElementById('alert-ubicacion').value,
-        telegramId: document.getElementById('alert-telegram-id').value.trim()
+        nivel: document.getElementById('alert-nivel').value,
+        nombre: document.getElementById('alert-nombre').value,
+        telegramId: telegramId,
+        email: email
     };
 
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
-            body: JSON.stringify({ action: 'saveAlert', data: alertData })
+            body: JSON.stringify({
+                action: 'saveAlert',
+                data: alertData
+            })
         });
         const result = await response.json();
         
         if (result.success) {
             statusDiv.textContent = result.message;
             statusDiv.style.color = '#28a745';
-            document.getElementById('alert-form').reset();
+            form.reset();
+            // Ocultar de nuevo el filtro de nivel por si estaba visible
+            document.getElementById('alert-level-container').classList.add('hidden');
         } else {
             throw new Error(result.error);
         }
+
     } catch (error) {
         statusDiv.textContent = `Error: ${error.message}`;
         statusDiv.style.color = '#dc3545';
+    } finally {
+        submitButton.disabled = false;
     }
 }
