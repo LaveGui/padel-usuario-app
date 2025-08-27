@@ -107,23 +107,29 @@
         <div class="modal-content">
             <button class="modal-close" id="modal-close-btn">&times;</button>
             <h2>Añadir Resultado</h2>
-            <form id="result-form">
-                <input type="hidden" id="match-id-input">
-                <div class="form-group">
-                    <label>Pareja 1</label>
-                    <p id="modal-team1-name" class="modal-team-name"></p>
-                </div>
-                <div class="form-group">
-                    <label>Pareja 2</label>
-                    <p id="modal-team2-name" class="modal-team-name"></p>
-                </div>
-                <div class="form-group">
-                    <label for="result-string">Resultado (ej: 6-4, 7-5)</label>
-                    <input type="text" id="result-string" placeholder="Separado por comas" required>
-                </div>
-                <button type="submit" class="primary-button">Guardar Resultado</button>
-                <div id="result-form-status"></div>
-            </form>
+                <form id="result-form">
+                    <input type="hidden" id="match-id-input">
+    <div class="result-grid">
+        <div class="header-p1">Pareja A</div>
+        <div class="header-p2">Pareja B</div>
+        <div id="modal-team1-name" class="team-name-p1"></div>
+        <div id="modal-team2-name" class="team-name-p2"></div>
+
+        <label class="set-label">Set 1</label>
+        <input type="number" id="set1_p1" class="score-input" min="0" max="10">
+        <input type="number" id="set1_p2" class="score-input" min="0" max="10">
+
+        <label class="set-label">Set 2</label>
+        <input type="number" id="set2_p1" class="score-input" min="0" max="10">
+        <input type="number" id="set2_p2" class="score-input" min="0" max="10">
+
+        <label class="set-label">Set 3 (si aplica)</label>
+        <input type="number" id="set3_p1" class="score-input" min="0" max="20">
+                     <input type="number" id="set3_p2" class="score-input" min="0" max="20">
+                     </div>
+                      <button type="submit" class="primary-button">Guardar Resultado</button>
+                    <div id="result-form-status"></div>
+                </form>
         </div>
     </div>
 

@@ -345,3 +345,45 @@ tbody tr.highlight { background-color: #e8f8f5; }
 #result-form-status { text-align: center; margin-top: 10px; font-weight: 600; }
 
 .hidden { display: none; }
+
+/* --- Estilos para el Nuevo Modal de Resultados --- */
+.result-grid {
+    display: grid;
+    grid-template-columns: auto 1fr 1fr;
+    gap: 10px 15px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.result-grid label {
+    font-weight: 600;
+    color: var(--secondary-text-color);
+}
+.result-grid .header-p1, .result-grid .header-p2 {
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.9em;
+    text-transform: uppercase;
+}
+.result-grid .team-name-p1, .result-grid .team-name-p2 {
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.1em;
+}
+.score-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1.2em;
+    text-align: center;
+    box-sizing: border-box;
+}
+/* Ocultamos las flechas de los input numéricos para un look más limpio */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}

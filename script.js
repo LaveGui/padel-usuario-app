@@ -100,9 +100,19 @@ function renderMatchesList(matches) {
         matchEl.dataset.team1Id = match['Numero Pareja 1'];
         matchEl.dataset.team2Id = match['Numero Pareja 2'];
         
-        const teams = `<span>${match['Nombre Pareja 1']}</span> vs <span>${match['Nombre Pareja 2']}</span>`;
-        let resultHtml;
+        // --- LÓGICA PARA RESALTAR AL GANADOR ---
+        let team1Name = `<span>${match['Nombre Pareja 1']}</span>`;
+        let team2Name = `<span>${match['Nombre Pareja 2']}</span>`;
 
+        if (match.ganador === 1) {
+            team1Name = `<strong>${match['Nombre Pareja 1']}</strong>`;
+        } else if (match.ganador === 2) {
+            team2Name = `<strong>${match['Nombre Pareja 2']}</strong>`;
+        }
+        const teams = `${team1Name} vs ${team2Name}`;
+        // --- FIN DE LA LÓGICA ---
+
+        let resultHtml;
         if (match.Estado === 'Jugado') {
             resultHtml = `<div class="match-result">${match.Resultado}</div>`;
         } else {
@@ -162,14 +172,22 @@ function openResultModal(matchId = null, team1Name = '', team2Name = '') {
     modal.classList.remove('hidden');
 }
 
+
 async function submitMatchResult(event) {
     event.preventDefault();
     const statusDiv = document.getElementById('result-form-status');
     statusDiv.textContent = 'Guardando...';
+    statusDiv.style.color = '#555';
 
+    // Leer los datos del nuevo formulario
     const data = {
         partidoId: document.getElementById('match-id-input').value,
-        resultadoStr: document.getElementById('result-string').value
+        set1_p1: document.getElementById('set1_p1').value,
+        set1_p2: document.getElementById('set1_p2').value,
+        set2_p1: document.getElementById('set2_p1').value,
+        set2_p2: document.getElementById('set2_p2').value,
+        set3_p1: document.getElementById('set3_p1').value,
+        set3_p2: document.getElementById('set3_p2').value,
     };
 
     try {
@@ -179,7 +197,7 @@ async function submitMatchResult(event) {
         });
         const result = await response.json();
         if (result.success) {
-            leagueData = result.data; // Actualizamos los datos con la respuesta del servidor
+            leagueData = result.data;
             renderClassificationTable(leagueData.clasificacion);
             renderMatchesList(leagueData.partidos);
             document.getElementById('result-modal').classList.add('hidden');
@@ -188,8 +206,10 @@ async function submitMatchResult(event) {
         }
     } catch (error) {
         statusDiv.textContent = `Error: ${error.message}`;
+        statusDiv.style.color = '#dc3545';
     }
 }
+
 function populateTimeFilters() {
     const fromSelect = document.getElementById('time-from-filter');
     const toSelect = document.getElementById('time-to-filter');
