@@ -8,7 +8,6 @@ let leagueData = {}; // Para la pestaña "Liga"
 
 
 // --- Listener Principal Unificado ---
-// --- Listener Principal Unificado ---
 document.addEventListener('DOMContentLoaded', () => {
     // --- Lógica de Pestañas ---
     const tabs = document.querySelectorAll('.tab-button');
@@ -23,11 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Inicialización de la Pestaña LIGA ---
-    fetchAndRenderLeague();
     document.getElementById('team-filter').addEventListener('change', handleTeamSelection);
-    document.getElementById('add-result-main-btn').addEventListener('click', () => openResultModal());
     document.getElementById('result-form').addEventListener('submit', submitMatchResult);
     document.getElementById('modal-close-btn').addEventListener('click', () => document.getElementById('result-modal').classList.add('hidden'));
+    fetchAndRenderLeague();
 
     // Lógica del Tablón de Partidos
     fetchMatches();
@@ -47,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 async function fetchAndRenderLeague() {
-    // Aquí podrías añadir un loader específico para la liga
     try {
         const response = await fetch(`${API_URL}?endpoint=getLeagueData`);
         const result = await response.json();
@@ -61,7 +58,6 @@ async function fetchAndRenderLeague() {
         }
     } catch (error) {
         console.error("Error al cargar datos de la liga:", error);
-        // Aquí podrías mostrar un error en la UI
     }
 }
 
@@ -91,6 +87,7 @@ function renderClassificationTable(classification) {
     });
 }
 
+// --- VERSIÓN CORREGIDA ---
 function renderMatchesList(matches) {
     const container = document.getElementById('matches-list-container');
     container.innerHTML = '';
@@ -100,17 +97,16 @@ function renderMatchesList(matches) {
         matchEl.dataset.team1Id = match['Numero Pareja 1'];
         matchEl.dataset.team2Id = match['Numero Pareja 2'];
         
-        // --- LÓGICA PARA RESALTAR AL GANADOR ---
         let team1Name = `<span>${match['Nombre Pareja 1']}</span>`;
         let team2Name = `<span>${match['Nombre Pareja 2']}</span>`;
 
-        if (match.ganador === 1) {
+        // CORRECCIÓN: Usamos '==' en lugar de '===' para ser flexibles con tipos (número vs texto)
+        if (match.ganador == 1) {
             team1Name = `<strong>${match['Nombre Pareja 1']}</strong>`;
-        } else if (match.ganador === 2) {
+        } else if (match.ganador == 2) {
             team2Name = `<strong>${match['Nombre Pareja 2']}</strong>`;
         }
         const teams = `${team1Name} vs ${team2Name}`;
-        // --- FIN DE LA LÓGICA ---
 
         let resultHtml;
         if (match.Estado === 'Jugado') {
@@ -126,6 +122,7 @@ function renderMatchesList(matches) {
         container.appendChild(matchEl);
     });
 }
+
 
 function handleTeamSelection(event) {
     const selectedTeamId = event.target.value;
