@@ -199,24 +199,29 @@ function initSearchTab() {
         applyMatchesFilter();
     });
 
-    // Cargar los datos de las partidas una sola vez
+    // Cargar los datos de las partidas una sola vez al cargar la pestaña por primera vez
+    // Esto asegura que tengamos los datos antes de cualquier filtrado
     fetchPublicMatches();
 }
 
 function populateDateFilters() {
-    const fromDate = document.getElementById('date-from-filter');
-    const toDate = document.getElementById('date-to-filter');
+    const fromDateInput = document.getElementById('date-from-filter'); // Renombrado para claridad
+    const toDateInput = document.getElementById('date-to-filter');     // Renombrado para claridad
+    
     const today = new Date();
     const maxDate = new Date();
     maxDate.setDate(today.getDate() + 14);
 
     const formatDate = (date) => date.toISOString().split('T')[0];
 
-    fromDate.value = formatDate(today);
-    toDate.value = formatDate(maxDate);
-    fromDate.min = formatDate(today);
-    toDate.min = formatDate(today);
+    fromDateInput.value = formatDate(today);
+    // No prellenamos toDateInput para que la lógica de "fecha hasta vacía" funcione
+    // toDateInput.value = formatDate(maxDate); // Eliminamos esto para permitir que esté vacío por defecto
+    
+    fromDateInput.min = formatDate(today);
+    toDateInput.min = formatDate(today);
 }
+
 
 function populateTimeFilters() {
     const fromSelect = document.getElementById('time-from-filter');
@@ -261,45 +266,67 @@ async function fetchPublicMatches() {
         const result = await response.json();
         if (result.success) {
             allPublicMatches = result.data;
+            // Después de cargar, si no hay filtro aplicado, podríamos renderizar todo
+            // Pero por ahora, mantenemos el placeholder hasta que el usuario busque explícitamente.
         } else {
             throw new Error(result.error);
         }
     } catch (error) {
-        document.getElementById('search-results-container').innerHTML = `<p style="color: red; text-align: center;">${error.message}</p>`;
+        document.getElementById('search-results-container').innerHTML = `<p style="color: red; text-align: center;">Error al cargar partidas: ${error.message}. Intenta recargar la página.</p>`;
     } finally {
         loader.classList.add('hidden');
     }
 }
 
+
 function applyMatchesFilter() {
     // 1. Leer todos los valores de los filtros
     const fromDate = document.getElementById('date-from-filter').value;
-    const toDate = document.getElementById('date-to-filter').value;
+    let toDate = document.getElementById('date-to-filter').value; // Usamos 'let' para poder modificarlo
     const fromTime = document.getElementById('time-from-filter').value;
     const toTime = document.getElementById('time-to-filter').value;
-    const location = document.getElementById('location-filter').value;
+    const location = document.getElementById('location-filter').value.toLowerCase(); // Convertir a minúsculas
     const searchType = document.getElementById('search-type-filter').value;
     const level = document.getElementById('level-filter').value;
 
     const loader = document.getElementById('loader');
     const container = document.getElementById('search-results-container');
     loader.classList.remove('hidden');
-    container.innerHTML = '';
+    container.innerHTML = ''; // Limpiamos los resultados anteriores al iniciar la búsqueda
+
+    // Lógica para "Fecha Hasta" vacía: si está vacío, se busca solo para el día 'fromDate'
+    if (!toDate && fromDate) {
+        toDate = fromDate; 
+    }
 
     // 2. Filtrar el array `allPublicMatches`
-    setTimeout(() => { // Simulamos una pequeña demora para que el loader sea visible
+    // Usamos un pequeño timeout para que el "Cargando..." sea visible, incluso si el filtrado es muy rápido.
+    setTimeout(() => { 
         const filtered = allPublicMatches.filter(match => {
+            // Filtrar por rango de fechas (fromDate y toDate)
             if (fromDate && match.fecha < fromDate) return false;
             if (toDate && match.fecha > toDate) return false;
+
+            // Filtrar por rango de horas
             if (fromTime && match.hora < fromTime) return false;
             if (toTime && match.hora > toTime) return false;
+
+            // Filtrar por ubicación (club)
             if (location && !match.pista.toLowerCase().includes(location)) return false;
+
+            // Filtrar por tipo de búsqueda
             if (searchType === 'libre' && match.plazas_libres !== 4) return false;
             if (searchType === 'faltan' && match.plazas_libres === 4) return false;
 
+            // Filtrar por nivel (solo si se selecciona "Faltan Jugadores" o "Ambas" y se ha elegido un nivel)
             if ((searchType === 'faltan' || searchType === 'ambas') && level) {
-                 if (match.jugadores.length === 0) return false; // Si no hay jugadores, no podemos filtrar por nivel
-                 if (!match.jugadores.some(p => p.nivel == level)) return false;
+                // Si no hay jugadores apuntados, no puede haber un nivel de partido definido por los jugadores.
+                if (!match.jugadores || match.jugadores.length === 0) return false; 
+                
+                // Comprobamos si AL MENOS UN jugador en el partido tiene el nivel seleccionado.
+                // Podríamos refinar esto para buscar un nivel "promedio" del partido si fuera necesario.
+                const hasPlayerWithLevel = match.jugadores.some(p => p.nivel && p.nivel.toString() === level);
+                if (!hasPlayerWithLevel) return false;
             }
             return true;
         });
@@ -307,8 +334,9 @@ function applyMatchesFilter() {
         // 3. Renderizar los resultados
         renderFilteredMatches(filtered);
         loader.classList.add('hidden');
-    }, 250);
+    }, 250); // Pequeña demora para visibilidad del loader
 }
+
 
 function renderFilteredMatches(matches) {
     const container = document.getElementById('search-results-container');
@@ -321,13 +349,15 @@ function renderFilteredMatches(matches) {
 
     matches.forEach(match => {
         const card = document.createElement('div');
-        card.className = 'card'; // Reutilizamos el estilo de 'card'
+        card.className = 'card search-result-card'; // Añadimos una clase específica para resultados de búsqueda si quieres estilos distintos
         
-        const fecha = new Date(match.fecha + 'T00:00:00');
-        const fechaStr = fecha.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+        // Formateo de fecha más amigable
+        // Aseguramos que la fecha sea un objeto Date válido para toLocaleDateString
+        const fechaMatch = new Date(match.fecha + 'T00:00:00'); 
+        const fechaStr = fechaMatch.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
 
         let playersHtml = '';
-        if (match.jugadores.length > 0) {
+        if (match.jugadores && match.jugadores.length > 0) { // Aseguramos que 'jugadores' existe
             playersHtml = `
                 <p><strong>Jugadores Apuntados:</strong></p>
                 <ul>
@@ -337,13 +367,29 @@ function renderFilteredMatches(matches) {
             playersHtml = '<p>¡Sé el primero en apuntarte!</p>';
         }
         
-        let statusText = match.plazas_libres === 4 ? `✅ <b>Pista Libre</b>` : `🔥 <b>¡Faltan ${match.plazas_libres}!</b>`;
+        let statusText;
+        if (match.plazas_libres === 4) {
+            statusText = `✅ <b>Pista Libre</b>`;
+        } else if (match.plazas_libres > 0) {
+            statusText = `🔥 <b>¡Faltan ${match.plazas_libres} jugadores!</b>`;
+        } else {
+            statusText = `👥 Partido Completo`; // En caso de que se muestren partidos completos
+        }
+        
+        // Aquí puedes incluir el botón de "Apuntarse" si la partida no está completa y hay plazas_libres
+        let actionButton = '';
+        if (match.plazas_libres > 0) {
+            actionButton = `<button class="secondary-button join-match-button" data-match-id="${match.id}">¡Apuntarse!</button>`;
+            // En un futuro, añadir un event listener para este botón
+        }
+
 
         card.innerHTML = `
             <h3>${match.pista}</h3>
             <p><strong>${fechaStr}</strong> a las <strong>${match.hora}hs</strong></p>
             <p>${statusText}</p>
             ${playersHtml}
+            ${actionButton}
         `;
         container.appendChild(card);
     });
