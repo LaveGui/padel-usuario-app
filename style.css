@@ -1,4 +1,4 @@
-/* style.css (Versión 4.2 - Limpia y Verificada) */
+/* style.css (Versión 4.3 - Diseño unificado y corregido) */
 :root {
     --bg-color: #f0f2f5;
     --card-bg: #ffffff;
@@ -11,77 +11,246 @@
     --font-family: 'Nunito', sans-serif;
 }
 
-body { font-family: var(--font-family); background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; line-height: 1.6; }
-.container { max-width: 580px; margin: 20px auto; padding: 0 15px; }
-header { text-align: center; padding: 20px 0; margin-bottom: 10px; }
-header h1 { margin-bottom: 5px; }
-header p { margin-top: 0; }
+body { 
+    font-family: var(--font-family); 
+    background-color: var(--bg-color); 
+    color: var(--text-color); 
+    margin: 0; 
+    padding: 0; 
+    line-height: 1.6; 
+}
 
-.tabs { display: flex; background-color: #e9ecef; padding: 5px; border-radius: 25px; margin-bottom: 30px; }
-.tab-button { flex: 1; padding: 10px 15px; border: none; background: none; cursor: pointer; font-size: 1em; font-weight: 600; font-family: var(--font-family); color: var(--secondary-text-color); border-radius: 20px; transition: all 0.3s ease; }
-.tab-button.active { background-color: var(--card-bg); color: var(--primary-color); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-.card { background: var(--card-bg); border-radius: 18px; box-shadow: var(--shadow); padding: 25px; margin-bottom: 25px; box-sizing: border-box; }
-.card h2 { margin: 0 0 20px 0; text-align: center; }
+.container { 
+    max-width: 580px; 
+    margin: 20px auto; 
+    padding: 0 15px; 
+}
 
-.personalized-view { display: flex; flex-direction: column; gap: 8px; }
-.personalized-view label { font-weight: 600; text-align: center; color: var(--secondary-text-color); }
-#team-filter { padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 25px; font-size: 1.1em; font-family: var(--font-family); background-color: var(--bg-color); }
-.stats-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 20px; }
-.stat-card { background-color: var(--bg-color); padding: 15px; border-radius: 12px; text-align: center; }
-.stat-card span { display: block; font-size: 0.9em; color: var(--secondary-text-color); }
-.stat-card strong { display: block; font-size: 1.8em; font-weight: 700; color: var(--primary-color); }
+header { 
+    text-align: center; 
+    padding: 20px 0; 
+    margin-bottom: 10px; 
+}
 
-.table-wrapper { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; }
-th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
-th { font-weight: 700; }
-tbody tr.highlight { background-color: #e8f8f5; font-weight: 700; }
+header h1 { 
+    margin-bottom: 5px; 
+}
 
-.matches-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.section-title { font-size: 1.6em; font-weight: 700; margin: 0; }
-.match-item { background: #fff; border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; margin-bottom: 10px; display: grid; grid-template-columns: 1fr auto; gap: 15px; align-items: center; }
-.match-item.highlight { border-left: 4px solid var(--primary-color); }
-.match-teams { font-weight: 600; }
-.match-result { font-weight: 700; text-align: right; }
-.match-item.pending .match-result { color: var(--secondary-text-color); font-style: italic; cursor: pointer; }
-.match-item.pending:hover .match-result { color: var(--primary-hover); }
+header p { 
+    margin-top: 0; 
+}
 
-.primary-button { background: var(--primary-color); color: #fff; border: none; padding: 12px 20px; font-size: 1em; font-weight: 700; border-radius: 30px; cursor: pointer; transition: background 0.2s; }
-.primary-button:hover { background: var(--primary-hover); }
-.primary-button:disabled { background-color: #bdc3c7; cursor: not-allowed; }
-.primary-button.small { padding: 8px 15px; font-size: 0.9em; }
+.tabs { 
+    display: flex; 
+    background-color: #e9ecef; 
+    padding: 5px; 
+    border-radius: 25px; 
+    margin-bottom: 30px; 
+}
 
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-.modal-content { background: #fff; padding: 30px; border-radius: 18px; width: 90%; max-width: 450px; position: relative; }
-.modal-close { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 2em; cursor: pointer; color: #aaa; }
+.tab-button { 
+    flex: 1; 
+    padding: 10px 15px; 
+    border: none; 
+    background: none; 
+    cursor: pointer; 
+    font-size: 1em; 
+    font-weight: 600; 
+    font-family: var(--font-family); 
+    color: var(--secondary-text-color); 
+    border-radius: 20px; 
+    transition: all 0.3s ease; 
+}
 
-.result-grid { display: grid; grid-template-columns: auto 1fr 1fr; gap: 12px 15px; align-items: center; margin-bottom: 25px; }
-.result-grid .team-header { text-align: center; font-weight: 700; font-size: 1.1em; grid-column: span 1; }
-.result-grid .set-label { font-weight: 600; color: var(--secondary-text-color); }
-.score-input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 12px; font-size: 1.2em; text-align: center; box-sizing: border-box; background-color: var(--bg-color); }
-/* --- NUEVO: Estilo para el ganador del partido --- */
+.tab-button.active { 
+    background-color: var(--card-bg); 
+    color: var(--primary-color); 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+}
+
+.tab-content { 
+    display: none; 
+}
+
+.tab-content.active { 
+    display: block; 
+}
+
+.card { 
+    background: var(--card-bg); 
+    border-radius: 18px; 
+    box-shadow: var(--shadow); 
+    padding: 25px; 
+    margin-bottom: 25px; 
+    box-sizing: border-box; 
+}
+
+.card h2 { 
+    margin: 0 0 20px 0; 
+    text-align: center; 
+}
+
+/* --- Estilos Pestaña Liga --- */
+
+.personalized-view { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 8px; 
+}
+
+.personalized-view label { 
+    font-weight: 600; 
+    text-align: center; 
+    color: var(--secondary-text-color); 
+}
+
+#team-filter { 
+    padding: 12px 15px; 
+    border: 1px solid var(--border-color); 
+    border-radius: 25px; 
+    font-size: 1.1em; 
+    font-family: var(--font-family); 
+    background-color: var(--bg-color); 
+}
+
+.stats-cards { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr 1fr; 
+    gap: 15px; 
+    margin-top: 20px; 
+}
+
+.stat-card { 
+    background-color: var(--bg-color); 
+    padding: 15px; 
+    border-radius: 12px; 
+    text-align: center; 
+}
+
+.stat-card span { 
+    display: block; 
+    font-size: 0.9em; 
+    color: var(--secondary-text-color); 
+}
+
+.stat-card strong { 
+    display: block; 
+    font-size: 1.8em; 
+    font-weight: 700; 
+    color: var(--primary-color); 
+}
+
+.table-wrapper { 
+    overflow-x: auto; 
+}
+
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+}
+
+th, td { 
+    padding: 12px 15px; 
+    text-align: left; 
+    border-bottom: 1px solid var(--border-color); 
+}
+
+th { 
+    font-weight: 700; 
+}
+
+tbody tr.highlight { 
+    background-color: #e8f8f5; 
+    font-weight: 700; 
+}
+
+.matches-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 20px; 
+}
+
+.section-title { 
+    font-size: 1.6em; 
+    font-weight: 700; 
+    margin: 0; 
+}
+
+.match-item { 
+    background: #fff; 
+    border: 1px solid var(--border-color); 
+    padding: 15px; 
+    border-radius: 12px; 
+    margin-bottom: 10px; 
+    display: grid; 
+    grid-template-columns: 1fr auto; 
+    gap: 15px; 
+    align-items: center; 
+}
+
+.match-item.highlight { 
+    border-left: 4px solid var(--primary-color); 
+}
+
+.match-teams { 
+    font-weight: 600; 
+}
+
 .match-teams .winner {
     color: var(--primary-color);
 }
 
-/* --- Estilos para el Nuevo Formulario "Buscar Pista" --- */
-.filter-card h2 {
-    font-size: 1.6em; /* Título más grande para la tarjeta de filtros */
+.match-result { 
+    font-weight: 700; 
+    text-align: right; 
 }
 
-.filters {
+.match-item.pending .match-result { 
+    color: var(--secondary-text-color); 
+    font-style: italic; 
+    cursor: pointer; 
+}
+
+.match-item.pending:hover .match-result { 
+    color: var(--primary-hover); 
+}
+
+
+/* --- Estilos para la Pestaña "Buscar Pista" --- */
+.filter-card .filters {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* 2 columnas por defecto */
-    gap: 18px; /* Un poco más de espacio */
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 20px;
 }
 
-.form-group.full-width {
-    grid-column: 1 / -1; /* Ocupa todo el ancho */
+.filter-card .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
-#matches-section .placeholder-text {
+.filter-card .form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.filter-card label {
+    font-weight: 600;
+    font-size: 0.9em;
+    color: var(--secondary-text-color);
+}
+
+.filter-card input, .filter-card select {
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 1em;
+    font-family: var(--font-family);
+    background-color: var(--bg-color);
+}
+
+.placeholder-text {
     text-align: center;
     color: var(--secondary-text-color);
     padding: 40px 20px;
@@ -90,98 +259,96 @@ tbody tr.highlight { background-color: #e8f8f5; font-weight: 700; }
     box-shadow: var(--shadow);
 }
 
-.hidden { display: none !important; } /* Usamos !important para asegurar que siempre se oculte */
 
-/* ... (tu CSS existente) ... */
+/* --- Estilos Comunes (Botones, Modales, etc.) --- */
 
-/* General Card Styling */
-.card {
-    background-color: var(--card-background);
-    border-radius: var(--border-radius);
-    padding: var(--spacing-medium);
-    box-shadow: var(--shadow-small);
-    margin-bottom: var(--spacing-medium);
-}
-
-/* Specific styling for the filter card to ensure grid layout */
-.filter-card .filters {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* 3 columnas responsivas */
-    gap: var(--spacing-small); /* Espacio entre los elementos del grid */
-    margin-bottom: var(--spacing-medium);
-}
-
-.filter-card .form-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.filter-card label {
-    font-size: var(--font-size-small);
-    color: var(--text-color-light);
-    margin-bottom: var(--spacing-extra-small);
-}
-
-.filter-card input[type="date"],
-.filter-card select {
+.primary-button { 
+    background: var(--primary-color); 
+    color: #fff; 
+    border: none; 
+    padding: 12px 20px; 
+    font-size: 1em; 
+    font-weight: 700; 
+    border-radius: 30px; 
+    cursor: pointer; 
+    transition: background 0.2s; 
     width: 100%;
-    padding: var(--spacing-extra-small);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    background-color: var(--input-background);
-    color: var(--text-color-dark);
-    font-size: var(--font-size-medium);
+    box-sizing: border-box;
 }
 
-/* Estilo para el botón de búsqueda */
-.filter-card .primary-button {
-    width: 100%; /* El botón ocupa todo el ancho */
-    padding: var(--spacing-small);
-    margin-top: var(--spacing-medium);
+.primary-button:hover { 
+    background: var(--primary-hover); 
 }
 
-/* Placeholder para los resultados */
-.placeholder-text {
-    text-align: center;
-    color: var(--text-color-light);
-    padding: var(--spacing-medium);
-    background-color: var(--card-background);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-small);
+.primary-button:disabled { 
+    background-color: #bdc3c7; 
+    cursor: not-allowed; 
 }
 
-/* Estilo para las tarjetas de resultado */
-#search-results-container .card {
-    background-color: var(--card-background);
-    border-radius: var(--border-radius);
-    padding: var(--spacing-medium);
-    box-shadow: var(--shadow-small);
-    margin-bottom: var(--spacing-small); /* Espacio entre tarjetas de resultados */
+.modal-overlay { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: rgba(0,0,0,0.6); 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    z-index: 1000; 
 }
 
-#search-results-container h3 {
-    color: var(--primary-color);
-    margin-top: 0;
-    margin-bottom: var(--spacing-extra-small);
+.modal-content { 
+    background: #fff; 
+    padding: 30px; 
+    border-radius: 18px; 
+    width: 90%; 
+    max-width: 450px; 
+    position: relative; 
 }
 
-#search-results-container ul {
-    list-style: none;
-    padding: 0;
-    margin: var(--spacing-extra-small) 0 0 0;
+.modal-close { 
+    position: absolute; 
+    top: 10px; 
+    right: 15px; 
+    background: none; 
+    border: none; 
+    font-size: 2em; 
+    cursor: pointer; 
+    color: #aaa; 
 }
 
-#search-results-container li {
-    background-color: var(--background-color); /* Un color ligeramente diferente para los jugadores */
-    padding: var(--spacing-extra-small);
-    border-radius: var(--border-radius);
-    margin-bottom: var(--spacing-extra-small);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.result-grid { 
+    display: grid; 
+    grid-template-columns: auto 1fr 1fr; 
+    gap: 12px 15px; 
+    align-items: center; 
+    margin-bottom: 25px; 
 }
 
-#search-results-container li:last-child {
-    margin-bottom: 0;
+.result-grid .team-header { 
+    text-align: center; 
+    font-weight: 700; 
+    font-size: 1.1em; 
+    grid-column: span 1; 
 }
 
+.result-grid .set-label { 
+    font-weight: 600; 
+    color: var(--secondary-text-color); 
+}
+
+.score-input { 
+    width: 100%; 
+    padding: 12px; 
+    border: 1px solid var(--border-color); 
+    border-radius: 12px; 
+    font-size: 1.2em; 
+    text-align: center; 
+    box-sizing: border-box; 
+    background-color: var(--bg-color); 
+}
+
+.hidden { 
+    display: none !important; 
+}
