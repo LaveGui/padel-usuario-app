@@ -336,48 +336,41 @@ tbody tr.highlight { background-color: #e8f8f5; }
 .primary-button:hover { background: var(--primary-hover); }
 .primary-button.small { padding: 8px 15px; font-size: 0.9em; }
 
-/* --- NUEVO: Ventana Modal --- */
+/* --- VENTANA MODAL (VERSIÓN CORREGIDA) --- */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-.modal-content { background: #fff; padding: 30px; border-radius: 18px; width: 90%; max-width: 400px; position: relative; }
+.modal-content { background: #fff; padding: 30px; border-radius: 18px; width: 90%; max-width: 450px; position: relative; }
 .modal-close { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 2em; cursor: pointer; color: #aaa; }
-.modal-team-name { font-size: 1.2em; font-weight: 600; background-color: var(--bg-color); padding: 10px; border-radius: 12px; text-align: center; }
 #result-form { display: flex; flex-direction: column; gap: 15px; }
 #result-form-status { text-align: center; margin-top: 10px; font-weight: 600; }
 
-.hidden { display: none; }
-
-/* --- Estilos para el Nuevo Modal de Resultados --- */
 .result-grid {
     display: grid;
-    grid-template-columns: auto 1fr 1fr;
-    gap: 10px 15px;
+    grid-template-columns: auto 1fr 1fr; /* 3 columnas: Etiqueta, Puntuación A, Puntuación B */
+    gap: 12px 15px;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
-.result-grid label {
+.result-grid .team-header {
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.1em;
+    grid-column: span 1; /* Cada encabezado ocupa una columna */
+}
+.result-grid .set-label {
     font-weight: 600;
     color: var(--secondary-text-color);
 }
-.result-grid .header-p1, .result-grid .header-p2 {
-    text-align: center;
-    font-weight: 700;
-    font-size: 0.9em;
-    text-transform: uppercase;
-}
-.result-grid .team-name-p1, .result-grid .team-name-p2 {
-    text-align: center;
-    font-weight: 600;
-    font-size: 1.1em;
-}
 .score-input {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 12px; /* Bordes más redondeados */
     font-size: 1.2em;
     text-align: center;
     box-sizing: border-box;
+    background-color: var(--bg-color);
 }
+
 /* Ocultamos las flechas de los input numéricos para un look más limpio */
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button { 
