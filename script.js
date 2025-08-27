@@ -529,14 +529,16 @@ async function handleAlertFormSubmit(event) {
     const form = event.target;
     const submitButton = form.querySelector('button[type="submit"]');
 
-    const telegramId = document.getElementById('alert-telegram-id').value.trim();
+    // ======== INICIO DE LA MODIFICACIÓN ========
+    // La validación principal ahora se centra en el email.
     const email = document.getElementById('alert-email').value.trim();
-
-    if (!telegramId && !email) {
-        statusDiv.textContent = 'Error: Debes proporcionar un ID de Telegram o un Email.';
+    if (!email) {
+        statusDiv.textContent = 'Error: El campo de Email es obligatorio.';
         statusDiv.style.color = '#dc3545';
-        return;
+        // El 'required' del HTML ya debería prevenir esto, pero es una doble seguridad.
+        return; 
     }
+    // ======== FIN DE LA MODIFICACIÓN ========
 
     statusDiv.textContent = 'Guardando alerta...';
     statusDiv.style.color = '#555';
@@ -549,8 +551,8 @@ async function handleAlertFormSubmit(event) {
         horaFin: document.getElementById('alert-hora-fin').value,
         ubicacion: document.getElementById('alert-ubicacion').value,
         nivel: document.getElementById('alert-nivel').value,
-        nombre: document.getElementById('alert-nombre').value,
-        telegramId: telegramId,
+        nombre: `Alerta Web - ${email}`, // Usamos el email para un nombre por defecto
+        telegramId: document.getElementById('alert-telegram-id').value.trim(),
         email: email
     };
 
@@ -568,7 +570,6 @@ async function handleAlertFormSubmit(event) {
             statusDiv.textContent = result.message;
             statusDiv.style.color = '#28a745';
             form.reset();
-            // Ocultar de nuevo el filtro de nivel por si estaba visible
             document.getElementById('alert-level-container').classList.add('hidden');
         } else {
             throw new Error(result.error);
