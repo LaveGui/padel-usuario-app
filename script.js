@@ -46,19 +46,63 @@ function initLeagueTab() {
     fetchAndRenderLeague();
 }
 
+function showLeagueLoaders() {
+    document.getElementById('classification-loader').classList.remove('hidden');
+    document.getElementById('matches-loader').classList.remove('hidden');
+    document.querySelector('.table-wrapper').classList.add('hidden');
+    document.getElementById('matches-list-container').classList.add('hidden');
+}
+
+function hideLeagueLoaders() {
+    document.getElementById('classification-loader').classList.add('hidden');
+    document.getElementById('matches-loader').classList.add('hidden');
+    document.querySelector('.table-wrapper').classList.remove('hidden');
+    document.getElementById('matches-list-container').classList.remove('hidden');
+}
+
 async function fetchAndRenderLeague() {
+    const cacheKey = 'padelLeagueData';
+
+    // 1. Intentar cargar datos desde la caché
+    const cachedData = localStorage.getItem(cacheKey);
+    if (cachedData) {
+        leagueData = JSON.parse(cachedData);
+        renderZoneView(); // Renderizar al instante con datos cacheados
+        hideLeagueLoaders(); // Nos aseguramos de que los loaders estén ocultos
+    } else {
+        showLeagueLoaders(); // Si no hay caché, mostrar loaders
+    }
+
+    // 2. Siempre buscar datos frescos de la API
     try {
         const response = await fetch(`${API_URL}?endpoint=getLeagueData`);
         const result = await response.json();
+
         if (result.success) {
+            // 3. Actualizar la variable global y la caché
             leagueData = result.data;
-            populateTeamFilter(leagueData.clasificacion);
-            renderZoneView(); // Renderizamos la vista por defecto (Zona A)
+            localStorage.setItem(cacheKey, JSON.stringify(leagueData));
+            
+            // 4. Volver a renderizar la vista con los datos frescos
+            // El usuario verá una actualización si los datos han cambiado
+            populateTeamFilter(leagueData.clasificacion); // Actualizar el dropdown por si hay cambios
+            renderZoneView(); 
         } else {
-            throw new Error(result.error);
+            // Si la API falla pero teníamos caché, el usuario no se ve afectado
+            console.error("La API falló, se muestran datos de caché si existen.");
+            if (!cachedData) { // Solo si no había caché, mostramos un error
+                 throw new Error(result.error);
+            }
         }
     } catch (error) {
         console.error("Error al cargar datos de la liga:", error);
+        if (!cachedData) { // Solo si no había caché, mostramos un error en la UI
+            document.getElementById('classification-loader').innerHTML = `<p style="color: red;">Error al cargar los datos.</p>`;
+            document.getElementById('matches-loader').innerHTML = '';
+        }
+    } finally {
+        // 5. Ocultar los loaders en cualquier caso (éxito o error)
+        hideLeagueLoaders();
     }
 }
 
@@ -68,6 +112,9 @@ function renderZoneView() {
     document.querySelectorAll('.zone-button').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.zone === currentZone);
     });
+
+    hideLeagueLoaders();
+
 
     // Filtrar y renderizar la clasificación
     const filteredClassification = leagueData.clasificacion.filter(team => team.Zona === currentZone);

@@ -377,3 +377,26 @@ tbody tr.highlight {
     color: white;
     border-color: var(--primary-color);
 }
+
+
+.loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 0;
+    min-height: 150px; /* Para que tenga espacio mientras carga */
+}
+
+.loader {
+    border: 5px solid var(--border-color); /* El círculo gris claro */
+    border-top: 5px solid var(--primary-color); /* El color que girará */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
