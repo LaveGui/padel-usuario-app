@@ -87,7 +87,7 @@ function renderClassificationTable(classification) {
     });
 }
 
-// --- VERSIÓN CORREGIDA ---
+// Reemplaza esta función completa en tu script.js
 function renderMatchesList(matches) {
     const container = document.getElementById('matches-list-container');
     container.innerHTML = '';
@@ -97,16 +97,19 @@ function renderMatchesList(matches) {
         matchEl.dataset.team1Id = match['Numero Pareja 1'];
         matchEl.dataset.team2Id = match['Numero Pareja 2'];
         
+        // --- INICIO DE LA MEJORA VISUAL ---
         let team1Name = `<span>${match['Nombre Pareja 1']}</span>`;
         let team2Name = `<span>${match['Nombre Pareja 2']}</span>`;
 
-        // CORRECCIÓN: Usamos '==' en lugar de '===' para ser flexibles con tipos (número vs texto)
+        // Usamos '==' para ser flexibles con tipos (número vs texto)
         if (match.ganador == 1) {
-            team1Name = `<strong>${match['Nombre Pareja 1']}</strong>`;
+            // Aplicamos negrita, color y el icono del trofeo al ganador
+            team1Name = `<strong class="winner">🏆 ${match['Nombre Pareja 1']}</strong>`;
         } else if (match.ganador == 2) {
-            team2Name = `<strong>${match['Nombre Pareja 2']}</strong>`;
+            team2Name = `<strong class="winner">🏆 ${match['Nombre Pareja 2']}</strong>`;
         }
         const teams = `${team1Name} vs ${team2Name}`;
+        // --- FIN DE LA MEJORA VISUAL ---
 
         let resultHtml;
         if (match.Estado === 'Jugado') {
