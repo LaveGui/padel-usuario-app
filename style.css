@@ -66,4 +66,28 @@ tbody tr.highlight { background-color: #e8f8f5; font-weight: 700; }
     color: var(--primary-color);
 }
 
+/* --- Estilos para el Nuevo Formulario "Buscar Pista" --- */
+.filter-card h2 {
+    font-size: 1.6em; /* Título más grande para la tarjeta de filtros */
+}
+
+.filters {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 columnas por defecto */
+    gap: 18px; /* Un poco más de espacio */
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1; /* Ocupa todo el ancho */
+}
+
+#matches-section .placeholder-text {
+    text-align: center;
+    color: var(--secondary-text-color);
+    padding: 40px 20px;
+    background-color: var(--card-bg);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+}
+
 .hidden { display: none !important; } /* Usamos !important para asegurar que siempre se oculte */

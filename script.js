@@ -210,25 +210,136 @@ async function submitMatchResult(event) {
     }
 }
 
+// ============================================================
+// ========= LÓGICA DE LA PESTAÑA "BUSCAR PISTA" ============
+// ============================================================
+
+function initMatchesTab() {
+    hasLoadedMatches = true;
+    console.log("Inicializando pestaña 'Buscar Pista'...");
+
+    // Poblar los filtros con valores dinámicos
+    populateDateFilters();
+    populateTimeFilters();
+    populateLevelFilter();
+
+    // Configurar listeners del formulario
+    document.getElementById('search-type-filter').addEventListener('change', toggleLevelFilter);
+    document.getElementById('search-form').addEventListener('submit', (event) => {
+        event.preventDefault(); // Evitamos que la página se recargue
+        applyMatchesFilter();
+    });
+
+    // Cargar los datos de las partidas
+    fetchPublicMatches();
+}
+
+function populateDateFilters() {
+    const fromDate = document.getElementById('date-from-filter');
+    const toDate = document.getElementById('date-to-filter');
+    const today = new Date();
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + 14);
+
+    const formatDate = (date) => date.toISOString().split('T')[0];
+
+    fromDate.value = formatDate(today);
+    toDate.value = formatDate(maxDate);
+    fromDate.min = formatDate(today);
+    toDate.min = formatDate(today);
+    fromDate.max = formatDate(maxDate);
+    toDate.max = formatDate(maxDate);
+}
+
 function populateTimeFilters() {
     const fromSelect = document.getElementById('time-from-filter');
     const toSelect = document.getElementById('time-to-filter');
     fromSelect.innerHTML = '<option value="">Desde...</option>';
     toSelect.innerHTML = '<option value="">Hasta...</option>';
-
     for (let h = 8; h <= 23; h++) {
         for (let m = 0; m < 60; m += 30) {
-            if (h === 23 && m === 30) continue; // La última hora es 23:00
-
-            const hourStr = String(h).padStart(2, '0');
-            const minStr = String(m).padStart(2, '0');
-            const timeValue = `${hourStr}:${minStr}`;
-            
+            if (h === 23 && m === 30) continue;
+            const timeValue = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
             fromSelect.innerHTML += `<option value="${timeValue}">${timeValue}</option>`;
             toSelect.innerHTML += `<option value="${timeValue}">${timeValue}</option>`;
         }
     }
-    toSelect.innerHTML += `<option value="23:30">23:30</option>`; // Añadimos la hora final
+    toSelect.innerHTML += `<option value="23:30">23:30</option>`;
+}
+
+function populateLevelFilter() {
+    const select = document.getElementById('level-filter');
+    const levels = ["3.75", "3.90", "4.0", "4.10", "4.20", "4.25", "4.30", "4.35"];
+    levels.forEach(level => {
+        select.innerHTML += `<option value="${level}">${level}</option>`;
+    });
+}
+
+function toggleLevelFilter() {
+    const searchType = document.getElementById('search-type-filter').value;
+    const levelContainer = document.getElementById('level-filter-container');
+    if (searchType === 'faltan' || searchType === 'ambas') {
+        levelContainer.classList.remove('hidden');
+    } else {
+        levelContainer.classList.add('hidden');
+    }
+}
+
+async function fetchPublicMatches() {
+    const loader = document.getElementById('loader');
+    loader.classList.remove('hidden');
+    
+    try {
+        const response = await fetch(`${API_URL}?endpoint=getPublicMatches`);
+        const result = await response.json();
+        if (result.success) {
+            allPublicMatches = result.data;
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (error) {
+        document.getElementById('matches-container').innerHTML = `<p style="color: red; text-align: center;">${error.message}</p>`;
+    } finally {
+        loader.classList.add('hidden');
+    }
+}
+
+function applyMatchesFilter() {
+    const fromDate = document.getElementById('date-from-filter').value;
+    const toDate = document.getElementById('date-to-filter').value;
+    const fromTime = document.getElementById('time-from-filter').value;
+    const toTime = document.getElementById('time-to-filter').value;
+    const location = document.getElementById('location-filter').value;
+    const searchType = document.getElementById('search-type-filter').value;
+    const level = document.getElementById('level-filter').value;
+
+    const loader = document.getElementById('loader');
+    loader.classList.remove('hidden');
+    document.getElementById('matches-container').innerHTML = '';
+
+    // Simulamos una pequeña demora para que el loader sea visible
+    setTimeout(() => {
+        const filtered = allPublicMatches.filter(match => {
+            // Lógica de filtrado
+            if (fromDate && match.fecha < fromDate) return false;
+            if (toDate && match.fecha > toDate) return false;
+            if (fromTime && match.hora < fromTime) return false;
+            if (toTime && match.hora > toTime) return false;
+            if (location && !match.pista.toLowerCase().includes(location)) return false;
+
+            if (searchType === 'libre' && match.plazas_libres !== 4) return false;
+            if (searchType === 'faltan' && match.plazas_libres === 4) return false;
+
+            if ((searchType === 'faltan' || searchType === 'ambas') && level) {
+                if (!match.jugadores.some(p => p.nivel == level)) return false;
+            }
+
+            return true;
+        });
+
+        renderFilteredMatches(filtered);
+        loader.classList.add('hidden');
+    }, 250); // 250 milisegundos
 }
 
 
@@ -255,7 +366,7 @@ async function fetchMatches() {
     }
 }
 
-function renderMatches(matches) {
+function renderFilteredMatches(matches) {
     const container = document.getElementById('matches-container');
     container.innerHTML = '';
 

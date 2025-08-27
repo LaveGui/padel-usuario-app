@@ -67,18 +67,56 @@
 
             <div id="tab-content-partidos" class="tab-content">
                 <section class="card filter-card">
-                    <h2>Encuentra tu Match</h2>
-                    <div class="filters">
-                        <div class="form-group"><label for="date-filter">Fecha</label><input type="date" id="date-filter"></div>
-                        <div class="form-group"><label for="location-filter">Club</label><select id="location-filter"><option value="">Cualquier Club</option><option value="valencia">Valencia</option><option value="picaña">Picaña</option></select></div>
-                        <div class="form-group"><label for="time-from-filter">Desde las</label><select id="time-from-filter"></select></div>
-                        <div class="form-group"><label for="time-to-filter">Hasta las</label><select id="time-to-filter"></select></div>
-                        <div class="form-group full-width"><label for="level-filter">Nivel del Partido</label><input type="text" id="level-filter" placeholder="Ej: 4.0, 4.25..."></div>
-                    </div>
+                    <h2>Buscar Pistas Disponibles</h2>
+                    <form id="search-form">
+                        <div class="filters">
+                            <div class="form-group">
+                                <label for="date-from-filter">Desde el día</label>
+                                <input type="date" id="date-from-filter">
+                            </div>
+                            <div class="form-group">
+                                <label for="date-to-filter">Hasta el día</label>
+                                <input type="date" id="date-to-filter">
+                            </div>
+                            <div class="form-group">
+                                <label for="time-from-filter">Desde las</label>
+                                <select id="time-from-filter"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="time-to-filter">Hasta las</label>
+                                <select id="time-to-filter"></select>
+                            </div>
+                             <div class="form-group full-width">
+                                <label for="location-filter">Club</label>
+                                <select id="location-filter">
+                                    <option value="">Cualquier Club</option>
+                                    <option value="valencia">Valencia</option>
+                                    <option value="picaña">Picaña</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="search-type-filter">Tipo de Búsqueda</label>
+                                <select id="search-type-filter">
+                                    <option value="libre">Pista Libre</option>
+                                    <option value="faltan">Faltan Jugadores</option>
+                                    <option value="ambas">Ambas</option>
+                                </select>
+                            </div>
+                            <div class="form-group hidden" id="level-filter-container">
+                                <label for="level-filter">Nivel del Partido</label>
+                                <select id="level-filter">
+                                    <option value="">Cualquier Nivel</option>
+                                    </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="primary-button">Buscar Pistas</button>
+                    </form>
                 </section>
                 <section id="matches-section">
-                    <div id="loader">Cargando partidas...</div>
-                    <div id="matches-container"></div>
+                    <div id="loader" class="hidden">Cargando...</div>
+                    <div id="matches-container">
+                        <p class="placeholder-text">Usa los filtros y pulsa "Buscar Pistas" para ver los resultados.</p>
+                    </div>
                 </section>
             </div>
 
