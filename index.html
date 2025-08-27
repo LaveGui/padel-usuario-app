@@ -131,7 +131,7 @@
     <section class="card alert-card">
         <h2>🔔 Crear una Alerta Personalizada</h2>
         <p class="form-description">
-            Usa los mismos filtros que en la búsqueda. Te avisaremos por email cuando encontremos una partida para ti.
+            Usa los filtros para definir la partida perfecta. Te avisaremos por email cuando la encontremos.
         </p>
         <form id="alert-form">
             <div class="filters">
@@ -144,9 +144,23 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label for="alert-ubicacion">Club</label>
+                    <select id="alert-ubicacion">
+                        <option value="cualquiera">Cualquier Club</option>
+                        <option value="valencia">Valencia</option>
+                        <option value="picaña">Picaña</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="alert-fecha">¿Para qué día?</label>
                     <input type="date" id="alert-fecha">
                     <small class="form-help-text">Déjalo en blanco para cualquier día.</small>
+                </div>
+                <div class="form-group hidden" id="alert-level-container">
+                    <label for="alert-nivel">Nivel del Partido</label>
+                    <select id="alert-nivel">
+                        <option value="">Cualquier Nivel</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="alert-hora-inicio">Desde las</label>
@@ -156,37 +170,29 @@
                     <label for="alert-hora-fin">Hasta las</label>
                     <select id="alert-hora-fin"></select>
                 </div>
-                <div class="form-group">
-                    <label for="alert-ubicacion">Club</label>
-                    <select id="alert-ubicacion">
-                        <option value="cualquiera">Cualquier Club</option>
-                        <option value="valencia">Valencia</option>
-                        <option value="picaña">Picaña</option>
-                    </select>
-                </div>
-                <div class="form-group hidden" id="alert-level-container">
-                    <label for="alert-nivel">Nivel del Partido</label>
-                    <select id="alert-nivel">
-                        <option value="">Cualquier Nivel</option>
-                    </select>
-                </div>
             </div>
-            
+
+            <hr class="form-divider">
+
+            <div class="form-group">
+                <label for="alert-nombre">Nombre de la Alerta (Opcional)</label>
+                <input type="text" id="alert-nombre" placeholder="Ej: Partidos mediodía en Picaña">
+            </div>
             <div class="form-group">
                 <label for="alert-email">Tu Email (Obligatorio)</label>
                 <input type="email" id="alert-email" placeholder="tu.email@ejemplo.com" required>
             </div>
-            <div class="form-group">
+             <div class="form-group">
                 <label for="alert-telegram-id">Tu ID de Telegram (Opcional)</label>
                 <input type="text" id="alert-telegram-id" placeholder="ID numérico si prefieres aviso por Telegram">
                 <small class="form-help-text">Para obtener tu ID, envía un mensaje a <a href="https://t.me/userinfobot" target="_blank" rel="noopener noreferrer">@userinfobot</a>.</small>
             </div>
 
             <button type="submit" class="primary-button">Crear Alerta</button>
-            <div id="form-status"></div>
+            <div id="form-status" class="form-status-message"></div>
         </form>
     </section>
-        </div>
+</div>
         </main>
     </div>
 

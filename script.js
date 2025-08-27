@@ -501,8 +501,13 @@ function renderFilteredMatches(matches) {
 // ========= PESTAÑA "CREAR ALERTA" ===========================
 // ============================================================
 
+// ============================================================
+// ========= PESTAÑA "CREAR ALERTA" (LÓGICA ACTUALIZADA) ======
+// ============================================================
+
 function initAlertsTab() {
     // Reutilizamos las funciones que ya creamos para poblar los filtros
+    // ¡Aquí corregimos el error de que no se poblaban las horas!
     populateTimeFilters('alert-hora-inicio', 'alert-hora-fin');
     populateLevelFilter('alert-nivel');
     
@@ -514,6 +519,7 @@ function initAlertsTab() {
             levelContainer.classList.remove('hidden');
         } else {
             levelContainer.classList.add('hidden');
+            document.getElementById('alert-nivel').value = ''; // Reseteamos el valor si se oculta
         }
     });
 
@@ -529,21 +535,20 @@ async function handleAlertFormSubmit(event) {
     const form = event.target;
     const submitButton = form.querySelector('button[type="submit"]');
 
-    // ======== INICIO DE LA MODIFICACIÓN ========
-    // La validación principal ahora se centra en el email.
     const email = document.getElementById('alert-email').value.trim();
     if (!email) {
+        // La validación del HTML (required) debería actuar primero,
+        // pero esto es una doble comprobación.
         statusDiv.textContent = 'Error: El campo de Email es obligatorio.';
         statusDiv.style.color = '#dc3545';
-        // El 'required' del HTML ya debería prevenir esto, pero es una doble seguridad.
-        return; 
+        return;
     }
-    // ======== FIN DE LA MODIFICACIÓN ========
 
     statusDiv.textContent = 'Guardando alerta...';
     statusDiv.style.color = '#555';
     submitButton.disabled = true;
 
+    // Recopilamos todos los datos del nuevo formulario
     const alertData = {
         plazas: document.getElementById('alert-plazas').value,
         fecha: document.getElementById('alert-fecha').value || 'cualquiera',
@@ -551,7 +556,7 @@ async function handleAlertFormSubmit(event) {
         horaFin: document.getElementById('alert-hora-fin').value,
         ubicacion: document.getElementById('alert-ubicacion').value,
         nivel: document.getElementById('alert-nivel').value,
-        nombre: `Alerta Web - ${email}`, // Usamos el email para un nombre por defecto
+        nombre: document.getElementById('alert-nombre').value,
         telegramId: document.getElementById('alert-telegram-id').value.trim(),
         email: email
     };
@@ -570,6 +575,7 @@ async function handleAlertFormSubmit(event) {
             statusDiv.textContent = result.message;
             statusDiv.style.color = '#28a745';
             form.reset();
+            // Ocultar de nuevo el filtro de nivel por si estaba visible
             document.getElementById('alert-level-container').classList.add('hidden');
         } else {
             throw new Error(result.error);

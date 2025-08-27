@@ -405,3 +405,14 @@ tbody tr.highlight {
     color: var(--secondary-text-color);
     margin-top: 5px;
 }
+.form-divider {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 25px 0;
+}
+
+.form-status-message {
+    text-align: center;
+    margin-top: 15px;
+    font-weight: 600;
+}
