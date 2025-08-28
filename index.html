@@ -102,14 +102,14 @@
                                     <option value="picaña">Picaña</option>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label for="search-type-filter">Tipo de Búsqueda</label>
-                                <select id="search-type-filter">
-                                    <option value="ambas">Ambas</option>
-                                    <option value="libre">Pista Libre</option>
-                                    <option value="faltan">Faltan Jugadores</option>
-                                </select>
-                            </div>
+                                <div class="form-group">
+                                    <label for="search-type-filter">Tipo de Búsqueda</label>
+                                    <select id="search-type-filter">
+                                        <option value="libre" selected>Pista Libre</option>
+                                        <option value="ambas">Ambas</option>
+                                        <option value="faltan">Faltan Jugadores</option>
+                                    </select>
+                                </div>
                             <div class="form-group hidden" id="level-filter-container">
                                 <label for="level-filter">Nivel del Partido</label>
                                 <select id="level-filter">
@@ -165,8 +165,8 @@
                 <div class="form-group">
                     <label for="alert-plazas">Tipo de búsqueda</label>
                     <select id="alert-plazas" required>
+                        <option value="libre" selected>Solo Pista Libre</option>
                         <option value="ambas">Ambas (Pista libre o faltan)</option>
-                        <option value="libre">Solo Pista Libre</option>
                         <option value="faltan">Faltan Jugadores</option>
                     </select>
                 </div>
