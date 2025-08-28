@@ -501,33 +501,33 @@ function renderFilteredMatches(matches) {
 // ========= PESTAÑA "CREAR ALERTA" ===========================
 // ============================================================
 
-// ============================================================
-// ========= PESTAÑA "CREAR ALERTA" (LÓGICA ACTUALIZADA) ======
-// ============================================================
-
 function initAlertsTab() {
-    // Rellenamos los desplegables de horas y nivel
+    // ¡AQUÍ ESTÁ LA CORRECCIÓN CLAVE!
+    // Se asegura de que los desplegables de hora y nivel se rellenen.
     populateTimeFilters('alert-hora-inicio', 'alert-hora-fin');
     populateLevelFilter('alert-nivel');
     
-    // Asignamos la fecha de hoy al campo "Desde el día" por defecto
     const fromDate = document.getElementById('alert-fecha-desde');
     const today = new Date().toISOString().split('T')[0];
-    fromDate.value = today;
-    fromDate.min = today;
-    document.getElementById('alert-fecha-hasta').min = today;
+    if(fromDate) {
+        fromDate.value = today;
+        fromDate.min = today;
+        document.getElementById('alert-fecha-hasta').min = today;
+    }
 
-    // Lógica para mostrar/ocultar el filtro de nivel
-    document.getElementById('alert-plazas').addEventListener('change', () => {
-        const searchType = document.getElementById('alert-plazas').value;
-        const levelContainer = document.getElementById('alert-level-container');
-        if (searchType === 'faltan' || searchType === 'ambas') {
-            levelContainer.classList.remove('hidden');
-        } else {
-            levelContainer.classList.add('hidden');
-            document.getElementById('alert-nivel').value = ''; // Reseteamos el valor si se oculta
-        }
-    });
+    const plazasSelect = document.getElementById('alert-plazas');
+    if(plazasSelect) {
+        plazasSelect.addEventListener('change', () => {
+            const searchType = plazasSelect.value;
+            const levelContainer = document.getElementById('alert-level-container');
+            if (searchType === 'faltan' || searchType === 'ambas') {
+                levelContainer.classList.remove('hidden');
+            } else {
+                levelContainer.classList.add('hidden');
+                document.getElementById('alert-nivel').value = '';
+            }
+        });
+    }
 
     const alertForm = document.getElementById('alert-form');
     if (alertForm) {
@@ -545,37 +545,25 @@ async function handleAlertFormSubmit(event) {
     statusDiv.style.color = '#555';
     submitButton.disabled = true;
 
-    // Recopilamos los datos del nuevo formulario rediseñado
     const fechaDesde = document.getElementById('alert-fecha-desde').value;
     let fechaHasta = document.getElementById('alert-fecha-hasta').value;
 
-    // Lógica para la fecha "Hasta": si está vacía, es igual a la fecha "Desde"
-    if (!fechaHasta) {
-        fechaHasta = fechaDesde;
-    }
-
     const alertData = {
         plazas: document.getElementById('alert-plazas').value,
-        fecha: fechaDesde, // El backend deberá ser adaptado para manejar un rango
-        // Para simplificar, por ahora solo enviamos la fecha de inicio.
-        // Podríamos enviar ambas si el backend se adapta para manejar rangos.
+        fecha: fechaDesde,
+        // (Nota: El backend actualmente solo usa una fecha, pero enviamos el dato por si se mejora en el futuro)
+        fecha_hasta: fechaHasta, 
         horaInicio: document.getElementById('alert-hora-inicio').value,
         horaFin: document.getElementById('alert-hora-fin').value,
+        ubicacion: document.getElementById('alert-ubicacion').value,
         nivel: document.getElementById('alert-nivel').value,
         email: document.getElementById('alert-email').value.trim(),
-        // Campos que ya no usamos en el formulario:
-        ubicacion: 'cualquiera', // Valor por defecto
-        telegramId: '',
-        nombre: ''
     };
 
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
-            body: JSON.stringify({
-                action: 'saveAlert',
-                data: alertData
-            })
+            body: JSON.stringify({ action: 'saveAlert', data: alertData })
         });
         const result = await response.json();
         
@@ -583,16 +571,13 @@ async function handleAlertFormSubmit(event) {
             statusDiv.textContent = result.message;
             statusDiv.style.color = '#28a745';
             form.reset();
-            // Restauramos la fecha de hoy por defecto tras el reseteo
             document.getElementById('alert-fecha-desde').value = new Date().toISOString().split('T')[0];
             document.getElementById('alert-level-container').classList.add('hidden');
         } else {
             throw new Error(result.error);
         }
-
     } catch (error) {
         statusDiv.textContent = `Error: ${error.message}`;
-        statusDiv.style.color = '#dc3545';
     } finally {
         submitButton.disabled = false;
     }
