@@ -325,9 +325,10 @@ function populateDateFilters() {
 }
 
 
-function populateTimeFilters() {
-    const fromSelect = document.getElementById('time-from-filter');
-    const toSelect = document.getElementById('time-to-filter');
+function populateTimeFilters(fromId, toId) {
+    const fromSelect = document.getElementById(fromId);
+    const toSelect = document.getElementById(toId);
+    if (!fromSelect || !toSelect) return;
     fromSelect.innerHTML = '<option value="">Desde...</option>';
     toSelect.innerHTML = '<option value="">Hasta...</option>';
     for (let h = 8; h <= 23; h++) {
