@@ -506,11 +506,17 @@ function renderFilteredMatches(matches) {
 // ============================================================
 
 function initAlertsTab() {
-    // Reutilizamos las funciones que ya creamos para poblar los filtros
-    // ¡Aquí corregimos el error de que no se poblaban las horas!
+    // Rellenamos los desplegables de horas y nivel
     populateTimeFilters('alert-hora-inicio', 'alert-hora-fin');
     populateLevelFilter('alert-nivel');
     
+    // Asignamos la fecha de hoy al campo "Desde el día" por defecto
+    const fromDate = document.getElementById('alert-fecha-desde');
+    const today = new Date().toISOString().split('T')[0];
+    fromDate.value = today;
+    fromDate.min = today;
+    document.getElementById('alert-fecha-hasta').min = today;
+
     // Lógica para mostrar/ocultar el filtro de nivel
     document.getElementById('alert-plazas').addEventListener('change', () => {
         const searchType = document.getElementById('alert-plazas').value;
@@ -535,30 +541,32 @@ async function handleAlertFormSubmit(event) {
     const form = event.target;
     const submitButton = form.querySelector('button[type="submit"]');
 
-    const email = document.getElementById('alert-email').value.trim();
-    if (!email) {
-        // La validación del HTML (required) debería actuar primero,
-        // pero esto es una doble comprobación.
-        statusDiv.textContent = 'Error: El campo de Email es obligatorio.';
-        statusDiv.style.color = '#dc3545';
-        return;
-    }
-
     statusDiv.textContent = 'Guardando alerta...';
     statusDiv.style.color = '#555';
     submitButton.disabled = true;
 
-    // Recopilamos todos los datos del nuevo formulario
+    // Recopilamos los datos del nuevo formulario rediseñado
+    const fechaDesde = document.getElementById('alert-fecha-desde').value;
+    let fechaHasta = document.getElementById('alert-fecha-hasta').value;
+
+    // Lógica para la fecha "Hasta": si está vacía, es igual a la fecha "Desde"
+    if (!fechaHasta) {
+        fechaHasta = fechaDesde;
+    }
+
     const alertData = {
         plazas: document.getElementById('alert-plazas').value,
-        fecha: document.getElementById('alert-fecha').value || 'cualquiera',
+        fecha: fechaDesde, // El backend deberá ser adaptado para manejar un rango
+        // Para simplificar, por ahora solo enviamos la fecha de inicio.
+        // Podríamos enviar ambas si el backend se adapta para manejar rangos.
         horaInicio: document.getElementById('alert-hora-inicio').value,
         horaFin: document.getElementById('alert-hora-fin').value,
-        ubicacion: document.getElementById('alert-ubicacion').value,
         nivel: document.getElementById('alert-nivel').value,
-        nombre: document.getElementById('alert-nombre').value,
-        telegramId: document.getElementById('alert-telegram-id').value.trim(),
-        email: email
+        email: document.getElementById('alert-email').value.trim(),
+        // Campos que ya no usamos en el formulario:
+        ubicacion: 'cualquiera', // Valor por defecto
+        telegramId: '',
+        nombre: ''
     };
 
     try {
@@ -575,7 +583,8 @@ async function handleAlertFormSubmit(event) {
             statusDiv.textContent = result.message;
             statusDiv.style.color = '#28a745';
             form.reset();
-            // Ocultar de nuevo el filtro de nivel por si estaba visible
+            // Restauramos la fecha de hoy por defecto tras el reseteo
+            document.getElementById('alert-fecha-desde').value = new Date().toISOString().split('T')[0];
             document.getElementById('alert-level-container').classList.add('hidden');
         } else {
             throw new Error(result.error);

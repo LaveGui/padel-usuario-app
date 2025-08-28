@@ -131,37 +131,20 @@
     <section class="card alert-card">
         <h2>🔔 Crear una Alerta Personalizada</h2>
         <p class="form-description">
-            Usa los filtros para definir la partida perfecta. Te avisaremos por email cuando la encontremos.
+            Configura tus preferencias y te avisaremos por email cuando encontremos una partida perfecta para ti.
         </p>
         <form id="alert-form">
             <div class="filters">
                 <div class="form-group">
-                    <label for="alert-plazas">Avísame cuando...</label>
-                    <select id="alert-plazas" required>
-                        <option value="ambas">Haya pista libre o falten jugadores</option>
-                        <option value="libre">Solo cuando haya pista libre</option>
-                        <option value="faltan">Solo cuando falten jugadores</option>
-                    </select>
+                    <label for="alert-fecha-desde">Desde el día</label>
+                    <input type="date" id="alert-fecha-desde" required>
                 </div>
                 <div class="form-group">
-                    <label for="alert-ubicacion">Club</label>
-                    <select id="alert-ubicacion">
-                        <option value="cualquiera">Cualquier Club</option>
-                        <option value="valencia">Valencia</option>
-                        <option value="picaña">Picaña</option>
-                    </select>
+                    <label for="alert-fecha-hasta">Hasta el día</label>
+                    <input type="date" id="alert-fecha-hasta">
+                    <small class="form-help-text">Opcional. Si lo dejas vacío, buscará solo para el primer día.</small>
                 </div>
-                <div class="form-group">
-                    <label for="alert-fecha">¿Para qué día?</label>
-                    <input type="date" id="alert-fecha">
-                    <small class="form-help-text">Déjalo en blanco para cualquier día.</small>
-                </div>
-                <div class="form-group hidden" id="alert-level-container">
-                    <label for="alert-nivel">Nivel del Partido</label>
-                    <select id="alert-nivel">
-                        <option value="">Cualquier Nivel</option>
-                    </select>
-                </div>
+
                 <div class="form-group">
                     <label for="alert-hora-inicio">Desde las</label>
                     <select id="alert-hora-inicio"></select>
@@ -170,22 +153,28 @@
                     <label for="alert-hora-fin">Hasta las</label>
                     <select id="alert-hora-fin"></select>
                 </div>
+
+                <div class="form-group">
+                    <label for="alert-plazas">Tipo de búsqueda</label>
+                    <select id="alert-plazas" required>
+                        <option value="ambas">Ambas (Pista libre o faltan)</option>
+                        <option value="libre">Solo Pista Libre</option>
+                        <option value="faltan">Faltan Jugadores</option>
+                    </select>
+                </div>
+                <div class="form-group hidden" id="alert-level-container">
+                    <label for="alert-nivel">Nivel del Partido</label>
+                    <select id="alert-nivel">
+                        <option value="">Cualquier Nivel</option>
+                    </select>
+                </div>
             </div>
 
             <hr class="form-divider">
 
             <div class="form-group">
-                <label for="alert-nombre">Nombre de la Alerta (Opcional)</label>
-                <input type="text" id="alert-nombre" placeholder="Ej: Partidos mediodía en Picaña">
-            </div>
-            <div class="form-group">
-                <label for="alert-email">Tu Email (Obligatorio)</label>
+                <label for="alert-email">Tu Email (para recibir el aviso)</label>
                 <input type="email" id="alert-email" placeholder="tu.email@ejemplo.com" required>
-            </div>
-             <div class="form-group">
-                <label for="alert-telegram-id">Tu ID de Telegram (Opcional)</label>
-                <input type="text" id="alert-telegram-id" placeholder="ID numérico si prefieres aviso por Telegram">
-                <small class="form-help-text">Para obtener tu ID, envía un mensaje a <a href="https://t.me/userinfobot" target="_blank" rel="noopener noreferrer">@userinfobot</a>.</small>
             </div>
 
             <button type="submit" class="primary-button">Crear Alerta</button>
