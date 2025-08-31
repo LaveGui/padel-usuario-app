@@ -202,3 +202,24 @@ input, select { padding: 12px; border: 1px solid var(--border-color); border-rad
 }
 
 
+.stats-cards {
+    /* Modificado para que quepan 4 columnas */
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 10px; /* Reducimos el espacio para que quepa mejor en móviles */
+    margin-top: 20px;
+}
+.stat-card strong {
+    font-size: 1.6em; /* Un poco más pequeño para acomodar el texto y los iconos */
+}
+
+/* --- CÓDIGO NUEVO A AÑADIR --- */
+/* Estilos para los colores del indicador de evolución */
+#stat-evolucion.positive {
+    color: #2ecc71; /* Verde para subidas */
+}
+#stat-evolucion.negative {
+    color: #e74c3c; /* Rojo para bajadas */
+}
+#stat-evolucion.neutral {
+    color: var(--secondary-text-color); /* Gris para sin cambios */
+}

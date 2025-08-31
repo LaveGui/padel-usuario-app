@@ -222,7 +222,6 @@ function renderMatchesList(matches) { // La función ahora recibe datos ya filtr
     });
 }
 
-
 function handleTeamSelection(event) {
     const selectedTeamId = event.target.value;
     const statsContainer = document.getElementById('stats-cards-container');
@@ -239,27 +238,40 @@ function handleTeamSelection(event) {
     const teamData = leagueData.clasificacion.find(t => t.Numero == selectedTeamId);
     if (teamData && teamData.Zona !== currentZone) {
         currentZone = teamData.Zona;
-        renderZoneView(); // Si la pareja es de otra zona, la mostramos
+        renderZoneView(leagueData.clasificacion, leagueData.clasificacion); // Pasamos datos para mantener la lógica de las flechas
     }
     
     // Esperamos un instante para que el DOM se actualice con la nueva zona si ha cambiado
     setTimeout(() => {
         const teamsInCurrentZone = leagueData.clasificacion.filter(t => t.Zona === currentZone);
-        
-        // Rellenar y mostrar tarjetas de stats
         const teamPosition = teamsInCurrentZone.findIndex(t => t.Numero == selectedTeamId) + 1;
         
         if(teamData) {
-            // ======== INICIO DE LA CORRECCIÓN ========
-            // Calculamos el total de partidos dinámicamente.
-            // En una liguilla, cada pareja juega contra todos los demás (n-1 partidos).
             const totalMatchesForZone = teamsInCurrentZone.length - 1;
             
             document.getElementById('stat-posicion').textContent = `#${teamPosition}`;
             document.getElementById('stat-puntos').textContent = teamData.Puntos;
-            // Usamos la nueva variable en lugar del valor fijo '10'
             document.getElementById('stat-partidos').textContent = `${teamData.PJ}/${totalMatchesForZone}`;
-            // ======== FIN DE LA CORRECCIÓN ========
+            
+            // --- INICIO DE LA NUEVA LÓGICA DE EVOLUCIÓN ---
+            const evolucionEl = document.getElementById('stat-evolucion');
+            const positionChange = teamData.positionChange;
+
+            // Reseteamos las clases de color
+            evolucionEl.classList.remove('positive', 'negative', 'neutral');
+
+            if (positionChange > 0) {
+                evolucionEl.textContent = `▲ +${positionChange}`;
+                evolucionEl.classList.add('positive');
+            } else if (positionChange < 0) {
+                // Math.abs para quitar el doble signo negativo
+                evolucionEl.textContent = `▼ -${Math.abs(positionChange)}`;
+                evolucionEl.classList.add('negative');
+            } else {
+                evolucionEl.textContent = '▬'; // Icono para "sin cambios"
+                evolucionEl.classList.add('neutral');
+            }
+            // --- FIN DE LA NUEVA LÓGICA ---
 
             statsContainer.classList.remove('hidden');
         }
@@ -269,6 +281,7 @@ function handleTeamSelection(event) {
         document.querySelectorAll(`.match-item[data-team1-id='${selectedTeamId}'], .match-item[data-team2-id='${selectedTeamId}']`).forEach(el => el.classList.add('highlight'));
     }, 100); // Pequeña demora para asegurar que la vista se ha renderizado
 }
+
 
 
 
