@@ -318,13 +318,7 @@ async function submitMatchResult(event) {
 function initSearchTab() {
     // Poblar los filtros con valores dinámicos
     populateDateFilters();
-    
-    // ======== INICIO DE LA CORRECCIÓN ========
-    // La función se estaba llamando sin parámetros ( populateTimeFilters() ).
-    // Ahora le pasamos los IDs correctos de los desplegables de esta pestaña.
     populateTimeFilters('time-from-filter', 'time-to-filter');
-    // ======== FIN DE LA CORRECCIÓN ========
-    
     populateLevelFilter();
 
     // Configurar listeners del formulario
@@ -334,8 +328,15 @@ function initSearchTab() {
         applyMatchesFilter();
     });
 
+    // --- AÑADIDO: Listener para el nuevo botón ---
+    // Esto hará que al pulsar nuestro nuevo botón, se haga 'clic' en la pestaña de Alertas.
+    document.getElementById('go-to-alerts-btn').addEventListener('click', () => {
+        document.querySelector('.tab-button[data-tab="alertas"]').click();
+    });
+    // --- FIN DEL AÑADIDO ---
+
+
     // Cargar los datos de las partidas una sola vez al cargar la pestaña por primera vez
-    // Esto asegura que tengamos los datos antes de cualquier filtrado
     fetchPublicMatches();
 }
 
@@ -416,8 +417,8 @@ async function fetchPublicMatches() {
 }
 
 
-// FUNCIÓN DE FILTRADO CORREGIDA
 function applyMatchesFilter() {
+    // 1. Leer todos los valores de los filtros
     const fromDate = document.getElementById('date-from-filter').value;
     let toDate = document.getElementById('date-to-filter').value;
     const fromTime = document.getElementById('time-from-filter').value;
@@ -428,44 +429,43 @@ function applyMatchesFilter() {
 
     const loader = document.getElementById('loader');
     const container = document.getElementById('search-results-container');
+    // --- AÑADIDO: Obtenemos el nuevo contenedor ---
+    const alertPrompt = document.getElementById('alert-prompt-container');
+    
     loader.classList.remove('hidden');
-    container.innerHTML = '';
+    container.innerHTML = ''; // Limpiamos los resultados anteriores
+    alertPrompt.classList.add('hidden'); // Lo ocultamos al iniciar cada nueva búsqueda
 
     if (!toDate && fromDate) {
         toDate = fromDate; 
     }
 
+    // 2. Filtrar el array `allPublicMatches`
     setTimeout(() => { 
         const filtered = allPublicMatches.filter(match => {
+            // ... (lógica de filtrado que ya corregimos antes, no cambia) ...
             if (fromDate && match.fecha < fromDate) return false;
             if (toDate && match.fecha > toDate) return false;
             if (fromTime && match.hora < fromTime) return false;
             if (toTime && match.hora > toTime) return false;
             if (location && !match.pista.toLowerCase().includes(location)) return false;
-
-            // Filtro por tipo de búsqueda
             if (searchType === 'libre' && match.plazas_libres !== 4) return false;
             if (searchType === 'faltan' && match.plazas_libres === 4) return false;
-
-            // --- INICIO DE LA CORRECCIÓN DEL FILTRO DE NIVEL ---
-            // El filtro de nivel solo se aplica si se ha seleccionado un nivel
             if (level && (searchType === 'faltan' || searchType === 'ambas')) {
-                // Si la partida tiene jugadores, verificamos que el nivel coincida
                 if (match.jugadores && match.jugadores.length > 0) {
                     const hasPlayerWithLevel = match.jugadores.some(p => p.nivel && p.nivel.toString() === level);
-                    if (!hasPlayerWithLevel) return false; // Si hay jugadores pero ninguno coincide, se descarta
+                    if (!hasPlayerWithLevel) return false;
                 } else {
-                    // La partida está vacía. Si buscamos "faltan", la descartamos.
-                    // Si buscamos "ambas", se permite (es una pista libre).
                     if (searchType === 'faltan') return false;
                 }
             }
-            // --- FIN DE LA CORRECCIÓN ---
-            
             return true;
         });
 
+        // 3. Renderizar los resultados
         renderFilteredMatches(filtered);
+        // --- AÑADIDO: Mostramos el contenedor del botón después de renderizar ---
+        alertPrompt.classList.remove('hidden');
         loader.classList.add('hidden');
     }, 250);
 }
