@@ -133,3 +133,26 @@ input, select { padding: 12px; border: 1px solid var(--border-color); border-rad
     font-weight: 600;
     min-height: 20px;
 }
+
+/* ============================================================ */
+/* ========= ESTILOS PARA INDICADORES DE RANKING ============== */
+/* ============================================================ */
+.rank-indicator {
+    display: inline-block;
+    margin-left: 8px;
+    font-weight: bold;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.rank-up {
+    color: #2ecc71; /* Verde primario */
+}
+
+.rank-down {
+    color: #e74c3c; /* Un rojo suave */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}

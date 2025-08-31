@@ -60,17 +60,23 @@ function hideLeagueLoaders() {
     document.getElementById('matches-list-container').classList.remove('hidden');
 }
 
+
 async function fetchAndRenderLeague() {
     const cacheKey = 'padelLeagueData';
+    const cachedDataString = localStorage.getItem(cacheKey);
+    let cachedData = null;
 
     // 1. Intentar cargar datos desde la caché
-    const cachedData = localStorage.getItem(cacheKey);
-    if (cachedData) {
-        leagueData = JSON.parse(cachedData);
-        renderZoneView(); // Renderizar al instante con datos cacheados
-        hideLeagueLoaders(); // Nos aseguramos de que los loaders estén ocultos
+    if (cachedDataString) {
+        cachedData = JSON.parse(cachedDataString);
+        leagueData = cachedData; // Actualizamos la variable global
+        // Pasamos la clasificación cacheada para la renderización inicial. 
+        // No hay "clasificación previa" en este punto, así que pasamos null.
+        renderZoneView(cachedData, null); 
+        populateTeamFilter(cachedData.clasificacion); // Rellenamos el filtro
+        hideLeagueLoaders();
     } else {
-        showLeagueLoaders(); // Si no hay caché, mostrar loaders
+        showLeagueLoaders();
     }
 
     // 2. Siempre buscar datos frescos de la API
@@ -83,48 +89,42 @@ async function fetchAndRenderLeague() {
             leagueData = result.data;
             localStorage.setItem(cacheKey, JSON.stringify(leagueData));
             
-            // 4. Volver a renderizar la vista con los datos frescos
-            // El usuario verá una actualización si los datos han cambiado
-            populateTeamFilter(leagueData.clasificacion); // Actualizar el dropdown por si hay cambios
-            renderZoneView(); 
+            // 4. Volver a renderizar con datos frescos, pasando la caché como "datos previos"
+            populateTeamFilter(leagueData.clasificacion);
+            renderZoneView(leagueData, cachedData); 
         } else {
-            // Si la API falla pero teníamos caché, el usuario no se ve afectado
-            console.error("La API falló, se muestran datos de caché si existen.");
-            if (!cachedData) { // Solo si no había caché, mostramos un error
+            if (!cachedData) {
                  throw new Error(result.error);
             }
         }
     } catch (error) {
         console.error("Error al cargar datos de la liga:", error);
-        if (!cachedData) { // Solo si no había caché, mostramos un error en la UI
+        if (!cachedData) {
             document.getElementById('classification-loader').innerHTML = `<p style="color: red;">Error al cargar los datos.</p>`;
             document.getElementById('matches-loader').innerHTML = '';
         }
     } finally {
-        // 5. Ocultar los loaders en cualquier caso (éxito o error)
         hideLeagueLoaders();
     }
 }
 
-// NUEVA FUNCIÓN: Encapsula la lógica de renderizado por zona
-function renderZoneView() {
-    // Actualizar el estado visual de los botones
+// NUEVA FUNCIÓN MEJORADA: Acepta datos actuales y previos
+function renderZoneView(dataToRender, previousData) {
     document.querySelectorAll('.zone-button').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.zone === currentZone);
     });
 
     hideLeagueLoaders();
 
+    const filteredClassification = dataToRender.clasificacion.filter(team => team.Zona === currentZone);
+    
+    // Obtenemos la clasificación previa de la misma zona para comparar.
+    const previousClassification = previousData ? previousData.clasificacion.filter(team => team.Zona === currentZone) : null;
+    renderClassificationTable(filteredClassification, previousClassification);
 
-    // Filtrar y renderizar la clasificación
-    const filteredClassification = leagueData.clasificacion.filter(team => team.Zona === currentZone);
-    renderClassificationTable(filteredClassification);
-
-    // Filtrar y renderizar los partidos
-    const filteredMatches = leagueData.partidos.filter(match => match.Zona === currentZone);
+    const filteredMatches = dataToRender.partidos.filter(match => match.Zona === currentZone);
     renderMatchesList(filteredMatches);
 }
-
 
 function populateTeamFilter(classification) {
     const select = document.getElementById('team-filter');
@@ -134,15 +134,42 @@ function populateTeamFilter(classification) {
     });
 }
 
-function renderClassificationTable(classification) { // La función ahora recibe datos ya filtrados
+// FUNCIÓN MEJORADA: Acepta una clasificación previa para mostrar indicadores
+function renderClassificationTable(classification, previousClassification) {
     const tableBody = document.getElementById('classification-table-body');
     tableBody.innerHTML = '';
+    
+    const previousRankMap = new Map();
+    if (previousClassification) {
+        // Ordenamos la clasificación previa igual que la actual para una comparación justa
+        previousClassification.sort((a, b) => {
+            if (b.Puntos !== a.Puntos) return b.Puntos - a.Puntos;
+            if (b.DS !== a.DS) return b.DS - a.DS;
+            return b.DJ - a.DJ;
+        }).forEach((team, index) => {
+            previousRankMap.set(team.Numero, index + 1);
+        });
+    }
+
     classification.forEach((team, index) => {
+        const currentRank = index + 1;
         const row = document.createElement('tr');
         row.dataset.teamId = team.Numero;
+
+        let rankIndicator = '';
+        const previousRank = previousRankMap.get(team.Numero);
+
+        if (previousRank && previousRank !== currentRank) {
+            if (currentRank < previousRank) {
+                rankIndicator = '<span class="rank-indicator rank-up">▲</span>';
+            } else {
+                rankIndicator = '<span class="rank-indicator rank-down">▼</span>';
+            }
+        }
+
         row.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${team.Pareja}</td>
+            <td>${currentRank}</td>
+            <td>${team.Pareja}${rankIndicator}</td>
             <td>${team.PJ}</td>
             <td>${team.Puntos}</td>
             <td>${team.DS}</td>
@@ -389,62 +416,58 @@ async function fetchPublicMatches() {
 }
 
 
+// FUNCIÓN DE FILTRADO CORREGIDA
 function applyMatchesFilter() {
-    // 1. Leer todos los valores de los filtros
     const fromDate = document.getElementById('date-from-filter').value;
-    let toDate = document.getElementById('date-to-filter').value; // Usamos 'let' para poder modificarlo
+    let toDate = document.getElementById('date-to-filter').value;
     const fromTime = document.getElementById('time-from-filter').value;
     const toTime = document.getElementById('time-to-filter').value;
-    const location = document.getElementById('location-filter').value.toLowerCase(); // Convertir a minúsculas
+    const location = document.getElementById('location-filter').value.toLowerCase();
     const searchType = document.getElementById('search-type-filter').value;
     const level = document.getElementById('level-filter').value;
 
     const loader = document.getElementById('loader');
     const container = document.getElementById('search-results-container');
     loader.classList.remove('hidden');
-    container.innerHTML = ''; // Limpiamos los resultados anteriores al iniciar la búsqueda
+    container.innerHTML = '';
 
-    // Lógica para "Fecha Hasta" vacía: si está vacío, se busca solo para el día 'fromDate'
     if (!toDate && fromDate) {
         toDate = fromDate; 
     }
 
-    // 2. Filtrar el array `allPublicMatches`
-    // Usamos un pequeño timeout para que el "Cargando..." sea visible, incluso si el filtrado es muy rápido.
     setTimeout(() => { 
         const filtered = allPublicMatches.filter(match => {
-            // Filtrar por rango de fechas (fromDate y toDate)
             if (fromDate && match.fecha < fromDate) return false;
             if (toDate && match.fecha > toDate) return false;
-
-            // Filtrar por rango de horas
             if (fromTime && match.hora < fromTime) return false;
             if (toTime && match.hora > toTime) return false;
-
-            // Filtrar por ubicación (club)
             if (location && !match.pista.toLowerCase().includes(location)) return false;
 
-            // Filtrar por tipo de búsqueda
+            // Filtro por tipo de búsqueda
             if (searchType === 'libre' && match.plazas_libres !== 4) return false;
             if (searchType === 'faltan' && match.plazas_libres === 4) return false;
 
-            // Filtrar por nivel (solo si se selecciona "Faltan Jugadores" o "Ambas" y se ha elegido un nivel)
-            if ((searchType === 'faltan' || searchType === 'ambas') && level) {
-                // Si no hay jugadores apuntados, no puede haber un nivel de partido definido por los jugadores.
-                if (!match.jugadores || match.jugadores.length === 0) return false; 
-                
-                // Comprobamos si AL MENOS UN jugador en el partido tiene el nivel seleccionado.
-                // Podríamos refinar esto para buscar un nivel "promedio" del partido si fuera necesario.
-                const hasPlayerWithLevel = match.jugadores.some(p => p.nivel && p.nivel.toString() === level);
-                if (!hasPlayerWithLevel) return false;
+            // --- INICIO DE LA CORRECCIÓN DEL FILTRO DE NIVEL ---
+            // El filtro de nivel solo se aplica si se ha seleccionado un nivel
+            if (level && (searchType === 'faltan' || searchType === 'ambas')) {
+                // Si la partida tiene jugadores, verificamos que el nivel coincida
+                if (match.jugadores && match.jugadores.length > 0) {
+                    const hasPlayerWithLevel = match.jugadores.some(p => p.nivel && p.nivel.toString() === level);
+                    if (!hasPlayerWithLevel) return false; // Si hay jugadores pero ninguno coincide, se descarta
+                } else {
+                    // La partida está vacía. Si buscamos "faltan", la descartamos.
+                    // Si buscamos "ambas", se permite (es una pista libre).
+                    if (searchType === 'faltan') return false;
+                }
             }
+            // --- FIN DE LA CORRECCIÓN ---
+            
             return true;
         });
 
-        // 3. Renderizar los resultados
         renderFilteredMatches(filtered);
         loader.classList.add('hidden');
-    }, 250); // Pequeña demora para visibilidad del loader
+    }, 250);
 }
 
 
