@@ -35,13 +35,21 @@ function initLeagueTab() {
     document.getElementById('result-form').addEventListener('submit', submitMatchResult);
     document.getElementById('modal-close-btn').addEventListener('click', () => document.getElementById('result-modal').classList.add('hidden'));
     
-    // NUEVO: Listeners para los botones de zona
+    // --- ESTA ES LA PARTE CORREGIDA ---
+    // Ahora, al hacer clic en un botón de zona, llamamos a renderZoneView
+    // pasándole los datos de la liga para que pueda redibujar la tabla.
+    // Pasamos 'null' como segundo parámetro porque al cambiar de grupo no queremos
+    // comparar posiciones ni mostrar flechas.
     document.querySelectorAll('.zone-button').forEach(button => {
         button.addEventListener('click', () => {
             currentZone = button.dataset.zone;
-            renderZoneView(); // Renderizamos la vista de la zona seleccionada
+            // Aseguramos que leagueData exista antes de intentar renderizar
+            if (leagueData && leagueData.clasificacion) {
+                renderZoneView(leagueData, null); 
+            }
         });
     });
+    // --- FIN DE LA CORRECCIÓN ---
 
     fetchAndRenderLeague();
 }
