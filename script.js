@@ -142,42 +142,46 @@ function populateTeamFilter(classification) {
     });
 }
 
-// FUNCIÓN MEJORADA: Acepta una clasificación previa para mostrar indicadores
+/**
+ * Dibuja la tabla de clasificación en el DOM.
+ * v3: Añade el icono de racha (🔥) y las flechas de posición.
+ */
 function renderClassificationTable(classification, previousClassification) {
     const tableBody = document.getElementById('classification-table-body');
     tableBody.innerHTML = '';
     
-    const previousRankMap = new Map();
+    // Creamos un mapa de posiciones previas para una búsqueda rápida
+    const previousPositions = {};
     if (previousClassification) {
-        // Ordenamos la clasificación previa igual que la actual para una comparación justa
-        previousClassification.sort((a, b) => {
-            if (b.Puntos !== a.Puntos) return b.Puntos - a.Puntos;
-            if (b.DS !== a.DS) return b.DS - a.DS;
-            return b.DJ - a.DJ;
-        }).forEach((team, index) => {
-            previousRankMap.set(team.Numero, index + 1);
+        previousClassification.forEach((team, index) => {
+            previousPositions[team.Numero] = index + 1;
         });
     }
 
     classification.forEach((team, index) => {
-        const currentRank = index + 1;
         const row = document.createElement('tr');
         row.dataset.teamId = team.Numero;
 
-        let rankIndicator = '';
-        const previousRank = previousRankMap.get(team.Numero);
+        // --- LÓGICA DE RACHAS (HOT STREAK) ---
+        const teamName = team.isOnFire ? `${team.Pareja} 🔥` : team.Pareja;
+        // --- FIN LÓGICA DE RACHAS ---
 
-        if (previousRank && previousRank !== currentRank) {
-            if (currentRank < previousRank) {
-                rankIndicator = '<span class="rank-indicator rank-up">▲</span>';
+        let positionIndicator = '';
+        const currentPosition = index + 1;
+        const previousPosition = previousPositions[team.Numero];
+
+        if (previousPosition && previousPosition !== currentPosition) {
+            if (currentPosition < previousPosition) {
+                positionIndicator = `<span class="pos-up"> ▲</span>`;
             } else {
-                rankIndicator = '<span class="rank-indicator rank-down">▼</span>';
+                positionIndicator = `<span class="pos-down"> ▼</span>`;
             }
         }
-
+        
+        // La celda de Pareja ahora incluye el nombre, el icono de racha (si aplica) y el indicador de posición
         row.innerHTML = `
-            <td>${currentRank}</td>
-            <td>${team.Pareja}${rankIndicator}</td>
+            <td>${currentPosition}</td>
+            <td>${teamName}${positionIndicator}</td>
             <td>${team.PJ}</td>
             <td>${team.Puntos}</td>
             <td>${team.DS}</td>
