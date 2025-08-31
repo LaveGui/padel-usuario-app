@@ -291,7 +291,13 @@ async function submitMatchResult(event) {
 function initSearchTab() {
     // Poblar los filtros con valores dinámicos
     populateDateFilters();
-    populateTimeFilters();
+    
+    // ======== INICIO DE LA CORRECCIÓN ========
+    // La función se estaba llamando sin parámetros ( populateTimeFilters() ).
+    // Ahora le pasamos los IDs correctos de los desplegables de esta pestaña.
+    populateTimeFilters('time-from-filter', 'time-to-filter');
+    // ======== FIN DE LA CORRECCIÓN ========
+    
     populateLevelFilter();
 
     // Configurar listeners del formulario
@@ -305,6 +311,7 @@ function initSearchTab() {
     // Esto asegura que tengamos los datos antes de cualquier filtrado
     fetchPublicMatches();
 }
+
 
 function populateDateFilters() {
     const fromDateInput = document.getElementById('date-from-filter'); // Renombrado para claridad

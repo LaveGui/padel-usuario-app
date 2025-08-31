@@ -56,3 +56,80 @@ input, select { padding: 12px; border: 1px solid var(--border-color); border-rad
 .form-divider { border: none; border-top: 1px solid var(--border-color); margin: 25px 0; }
 .form-status-message { text-align: center; margin-top: 15px; font-weight: 600; }
 .hidden { display: none !important; }
+
+/* ============================================================ */
+/* ========= ESTILOS PARA MODAL DE RESULTADOS ================= */
+/* ============================================================ */
+
+/* Estilo para el botón de cerrar (la '×') */
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 2.2em;
+    color: var(--secondary-text-color);
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+.modal-close:hover {
+    color: var(--text-color);
+}
+
+/* Contenedor principal del formulario de resultados */
+.result-grid {
+    display: grid;
+    /* Define 3 columnas: 1 para la etiqueta del set, 2 para los scores */
+    grid-template-columns: auto 1fr 1fr;
+    gap: 15px 10px; /* Espacio vertical y horizontal entre celdas */
+    align-items: center; /* Centra verticalmente los elementos */
+    margin: 20px 0;
+}
+
+/* Cabeceras con los nombres de las parejas */
+.team-header {
+    font-weight: 700;
+    text-align: center;
+    font-size: 1.1em;
+    margin-bottom: 5px;
+}
+
+/* Etiquetas de los sets (Set 1, Set 2, etc.) */
+.set-label {
+    font-weight: 600;
+    text-align: left;
+    padding-right: 10px;
+}
+
+/* Campos de entrada para los tanteos */
+.score-input {
+    text-align: center;
+    font-size: 1.2em;
+    /* Hereda estilos de los otros inputs, pero con ajustes */
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background-color: var(--bg-color);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Elimina las flechas de los inputs de tipo number */
+.score-input::-webkit-outer-spin-button,
+.score-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.score-input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Estilos para el mensaje de estado (Guardando..., Error...) */
+#result-form-status {
+    text-align: center;
+    margin-top: 15px;
+    font-weight: 600;
+    min-height: 20px;
+}
