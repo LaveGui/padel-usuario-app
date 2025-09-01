@@ -229,52 +229,62 @@ function renderMatchesList(matches) { // La función ahora recibe datos ya filtr
 function handleTeamSelection(event) {
     const selectedTeamId = event.target.value;
     const statsContainer = document.getElementById('stats-cards-container');
-    // NUEVO: Obtenemos el nuevo elemento del DOM
-    const telegramPrompt = document.getElementById('liga-telegram-prompt');
-    
+    const telegramPrompt = document.getElementById('telegram-prompt-liga');
+    const telegramLink = document.getElementById('telegram-link-liga');
+
     // Limpiamos highlights anteriores
     document.querySelectorAll('#classification-table-body tr, .match-item').forEach(el => el.classList.remove('highlight'));
-    
+
     if (!selectedTeamId) {
         statsContainer.classList.add('hidden');
-        telegramPrompt.classList.add('hidden'); // Lo ocultamos si no hay pareja seleccionada
+        telegramPrompt.classList.add('hidden');
         return;
     }
 
     const teamData = leagueData.clasificacion.find(t => t.Numero == selectedTeamId);
-    if (teamData && teamData.Zona !== currentZone) {
+    if (!teamData) return;
+
+    // --- NUEVA LÓGICA PARA EL ENLACE DINÁMICO ---
+    // 1. Preparamos el nombre para la URL (reemplazamos espacios por guiones)
+    const teamNameForUrl = teamData.Pareja.replace(/\s+/g, '-');
+    // 2. Construimos la URL personalizada con el deep link
+    const dynamicUrl = `https://t.me/PadelGuido1_bot?start=liga_team_${teamData.Numero}_${teamNameForUrl}`;
+    // 3. Asignamos la nueva URL al botón
+    telegramLink.href = dynamicUrl;
+    // --- FIN DE LA NUEVA LÓGICA ---
+
+    // LÓGICA DE CAMBIO AUTOMÁTICO DE ZONA
+    if (teamData.Zona !== currentZone) {
         currentZone = teamData.Zona;
-        renderZoneView(leagueData.clasificacion, leagueData.clasificacion);
+        renderZoneView(leagueData.clasificacion, leagueData.clasificacion_anterior);
     }
     
     setTimeout(() => {
         const teamsInCurrentZone = leagueData.clasificacion.filter(t => t.Zona === currentZone);
         const teamPosition = teamsInCurrentZone.findIndex(t => t.Numero == selectedTeamId) + 1;
         
-        if(teamData) {
-            const totalMatchesForZone = teamsInCurrentZone.length - 1;
-            document.getElementById('stat-posicion').textContent = `#${teamPosition}`;
-            document.getElementById('stat-puntos').textContent = teamData.Puntos;
-            document.getElementById('stat-partidos').textContent = `${teamData.PJ}/${totalMatchesForZone}`;
-            
-            const evolucionEl = document.getElementById('stat-evolucion');
-            const positionChange = teamData.positionChange;
-            evolucionEl.classList.remove('positive', 'negative', 'neutral');
-            if (positionChange > 0) {
-                evolucionEl.textContent = `▲ +${positionChange}`;
-                evolucionEl.classList.add('positive');
-            } else if (positionChange < 0) {
-                evolucionEl.textContent = `▼ -${Math.abs(positionChange)}`;
-                evolucionEl.classList.add('negative');
-            } else {
-                evolucionEl.textContent = '▬';
-                evolucionEl.classList.add('neutral');
-            }
-
-            statsContainer.classList.remove('hidden');
-            telegramPrompt.classList.remove('hidden'); // Lo mostramos junto a las tarjetas
+        document.getElementById('stat-posicion').textContent = `#${teamPosition}`;
+        document.getElementById('stat-puntos').textContent = teamData.Puntos;
+        
+        const totalMatchesForZone = teamsInCurrentZone.length - 1;
+        document.getElementById('stat-partidos').textContent = `${teamData.PJ}/${totalMatchesForZone}`;
+        
+        const evoEl = document.getElementById('stat-evolucion');
+        const change = teamData.positionChange;
+        let icon = '▬';
+        evoEl.className = '';
+        if (change > 0) {
+            icon = `▲ +${change}`;
+            evoEl.classList.add('positive');
+        } else if (change < 0) {
+            icon = `▼ ${change}`;
+            evoEl.classList.add('negative');
         }
-
+        evoEl.textContent = icon;
+        
+        statsContainer.classList.remove('hidden');
+        telegramPrompt.classList.remove('hidden');
+        
         document.querySelector(`#classification-table-body tr[data-team-id='${selectedTeamId}']`)?.classList.add('highlight');
         document.querySelectorAll(`.match-item[data-team1-id='${selectedTeamId}'], .match-item[data-team2-id='${selectedTeamId}']`).forEach(el => el.classList.add('highlight'));
     }, 100);
