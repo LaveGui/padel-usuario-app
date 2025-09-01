@@ -223,3 +223,37 @@ input, select { padding: 12px; border: 1px solid var(--border-color); border-rad
 #stat-evolucion.neutral {
     color: var(--secondary-text-color); /* Gris para sin cambios */
 }
+
+/* --- Estilos para las invitaciones a Telegram --- */
+.telegram-prompt {
+    background-color: #f0f7ff; /* Un azul muy claro */
+    border: 1px solid #d6e8ff;
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 5px; /* Ajustado para que esté pegado a las tarjetas de arriba */
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.9em;
+    line-height: 1.5;
+    color: var(--text-color);
+}
+
+.telegram-prompt svg {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    fill: #3498db; /* Azul de Telegram */
+}
+
+.telegram-prompt a {
+    color: #2980b9;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.telegram-prompt a:hover {
+    text-decoration: underline;
+}
