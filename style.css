@@ -257,3 +257,77 @@ input, select { padding: 12px; border: 1px solid var(--border-color); border-rad
 .telegram-prompt a:hover {
     text-decoration: underline;
 }
+
+/* --- Estilos para el Acordeón de Telegram --- */
+.telegram-accordion {
+    background-color: #ffffff;
+    border: 1px solid #eaf2fa;
+    border-radius: 14px;
+    margin-top: 5px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden; /* Clave para la animación */
+    transition: all 0.3s ease;
+}
+
+.accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    cursor: pointer; /* Indica que es clicable */
+}
+
+.accordion-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.05em;
+    color: var(--text-color);
+}
+
+.accordion-title svg {
+    fill: #3498db;
+    width: 24px;
+    height: 24px;
+}
+
+.telegram-button {
+    background-color: #3498db;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+}
+.telegram-button:hover {
+    background-color: #2980b9;
+}
+
+.accordion-content {
+    max-height: 0; /* Por defecto está colapsado */
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, padding 0.3s ease;
+    padding: 0 15px; /* Sin padding vertical cuando está cerrado */
+}
+
+.accordion-content p {
+    margin: 0;
+    padding-bottom: 15px; /* Espacio inferior cuando está abierto */
+    font-size: 0.9em;
+    line-height: 1.6;
+    color: var(--secondary-text-color);
+}
+
+/* Cuando el acordeón tiene la clase 'expanded', el contenido se muestra */
+.telegram-accordion.expanded .accordion-content {
+    max-height: 150px; /* Altura máxima para la animación */
+}
+
+/* Efecto visual al hacer clic en la cabecera */
+.accordion-header:active {
+    background-color: #f9f9f9;
+}

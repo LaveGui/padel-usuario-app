@@ -30,26 +30,34 @@ document.addEventListener('DOMContentLoaded', () => {
 // ============================================================
 // ========= PESTAÑA "LIGA" ===================================
 // ============================================================
+
 function initLeagueTab() {
     document.getElementById('team-filter').addEventListener('change', handleTeamSelection);
     document.getElementById('result-form').addEventListener('submit', submitMatchResult);
     document.getElementById('modal-close-btn').addEventListener('click', () => document.getElementById('result-modal').classList.add('hidden'));
     
-    // --- ESTA ES LA PARTE CORREGIDA ---
-    // Ahora, al hacer clic en un botón de zona, llamamos a renderZoneView
-    // pasándole los datos de la liga para que pueda redibujar la tabla.
-    // Pasamos 'null' como segundo parámetro porque al cambiar de grupo no queremos
-    // comparar posiciones ni mostrar flechas.
     document.querySelectorAll('.zone-button').forEach(button => {
         button.addEventListener('click', () => {
             currentZone = button.dataset.zone;
-            // Aseguramos que leagueData exista antes de intentar renderizar
             if (leagueData && leagueData.clasificacion) {
                 renderZoneView(leagueData, null); 
             }
         });
     });
-    // --- FIN DE LA CORRECCIÓN ---
+
+    // --- NUEVA LÓGICA PARA EL ACORDEÓN ---
+    const accordionHeader = document.querySelector('.accordion-header');
+    if (accordionHeader) {
+        accordionHeader.addEventListener('click', (event) => {
+            // Evitamos que el clic en el botón de "Unirse" también expanda/colapse
+            if (event.target.closest('.telegram-button')) {
+                return;
+            }
+            // Añadimos o quitamos la clase 'expanded' al contenedor principal
+            accordionHeader.parentElement.classList.toggle('expanded');
+        });
+    }
+    // --- FIN DE LA NUEVA LÓGICA ---
 
     fetchAndRenderLeague();
 }
