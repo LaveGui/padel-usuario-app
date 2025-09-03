@@ -219,9 +219,11 @@
         </main>
     </div>
 
-    <div id="result-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <button class="modal-close" id="modal-close-btn">&times;</button>
+<div id="result-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <button class="modal-close" id="modal-close-btn">&times;</button>
+        
+        <div id="result-form-view">
             <h2>Añadir Resultado</h2>
             <form id="result-form">
                 <input type="hidden" id="match-id-input">
@@ -245,7 +247,19 @@
                 <div id="result-form-status"></div>
             </form>
         </div>
+
+        <div id="result-success-view" class="hidden">
+            <div class="success-icon">✅</div>
+            <h2>¡Resultado Guardado!</h2>
+            <p>La clasificación ha sido actualizada.</p>
+            <div class="telegram-prompt-modal">
+                <span>No te pierdas los movimientos en la tabla. ¡Te avisamos en <b>Telegram</b>!</span>
+                <a href="https://t.me/TuPadelValenciaBot?start=liga_updates" target="_blank" rel="noopener noreferrer">Ver en Telegram</a>
+            </div>
+            <button id="modal-success-close-btn" class="primary-button">Cerrar</button>
+        </div>
     </div>
+</div>
 
     <script src="script.js"></script>
 </body>

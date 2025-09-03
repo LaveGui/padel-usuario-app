@@ -300,10 +300,12 @@ function handleTeamSelection(event) {
 
 
 
-
-
 function openResultModal(matchId, team1Name, team2Name) {
     const modal = document.getElementById('result-modal');
+    // --- LÓGICA MEJORADA ---
+    // Nos aseguramos de que al abrir, siempre se vea el formulario y no la vista de éxito
+    document.getElementById('result-form-view').classList.remove('hidden');
+    document.getElementById('result-success-view').classList.add('hidden');
     document.getElementById('result-form').reset();
     document.getElementById('result-form-status').textContent = '';
     
@@ -320,6 +322,10 @@ async function submitMatchResult(event) {
     statusDiv.textContent = 'Guardando...';
     statusDiv.style.color = '#555';
 
+    // --- LÓGICA MEJORADA: Paso 1 - Guardamos el contexto actual ---
+    const teamFilter = document.getElementById('team-filter');
+    const selectedTeamIdBeforeSubmit = teamFilter.value;
+
     const data = {
         partidoId: document.getElementById('match-id-input').value,
         set1_p1: document.getElementById('set1_p1').value, set1_p2: document.getElementById('set1_p2').value,
@@ -333,11 +339,27 @@ async function submitMatchResult(event) {
             body: JSON.stringify({ action: 'addMatchResult', data: data })
         });
         const result = await response.json();
+        
         if (result.success) {
-            leagueData = result.data; // Actualizamos los datos de la liga
-            renderClassificationTable(leagueData.clasificacion);
-            renderMatchesList(leagueData.partidos);
-            document.getElementById('result-modal').classList.add('hidden');
+            // --- LÓGICA MEJORADA: Paso 2 - Actualizamos datos y mostramos éxito ---
+            const cachedData = JSON.parse(localStorage.getItem('padelLeagueData') || '{}');
+            leagueData = result.data;
+            localStorage.setItem('padelLeagueData', JSON.stringify(leagueData));
+            
+            // Renderizamos la tabla de fondo con los datos nuevos
+            renderZoneView(leagueData, cachedData);
+
+            // Mostramos la vista de éxito
+            document.getElementById('result-form-view').classList.add('hidden');
+            document.getElementById('result-success-view').classList.remove('hidden');
+
+            // --- LÓGICA MEJORADA: Paso 3 - Restauramos el contexto ---
+            if (selectedTeamIdBeforeSubmit) {
+                teamFilter.value = selectedTeamIdBeforeSubmit;
+                // Disparamos el evento 'change' para que se actualicen las tarjetas y highlights
+                teamFilter.dispatchEvent(new Event('change'));
+            }
+
         } else {
             throw new Error(result.error);
         }
