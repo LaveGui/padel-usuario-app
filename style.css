@@ -395,20 +395,31 @@ input, select { padding: 12px; border: 1px solid var(--border-color); border-rad
     margin: 10px 0 20px 0;
 }
 
-.telegram-prompt-modal-button {
-    display: block;
-    background-color: #3498db;
+/* --- Estilos para el Botón principal de Telegram en el modal --- */
+.telegram-modal-main-button {
+    display: flex; /* Para centrar el icono y el texto */
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Espacio entre icono y texto */
+    background-color: #3498db; /* Azul de Telegram */
     color: #fff;
     padding: 12px;
     border-radius: 10px;
     text-decoration: none;
     font-weight: 600;
-    text-align: center;
+    width: 100%; /* Para que ocupe todo el ancho disponible */
+    box-sizing: border-box; /* Para que el padding no añada ancho */
     transition: background-color 0.2s ease;
 }
 
-.telegram-prompt-modal-button:hover {
-    background-color: #2980b9;
+.telegram-modal-main-button:hover {
+    background-color: #2980b9; /* Azul más oscuro al pasar el ratón */
+}
+
+.telegram-modal-main-button svg {
+    fill: #fff; /* Icono blanco */
+    width: 20px; /* Tamaño del icono */
+    height: 20px;
 }
 
 /* Botón secundario para "Cerrar" */
