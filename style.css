@@ -422,16 +422,26 @@ input, select { padding: 12px; border: 1px solid var(--border-color); border-rad
     height: 20px;
 }
 
-/* Botón secundario para "Cerrar" */
+/* ============================================================ */
+/* ========= ESTILOS PARA BOTONES SECUNDARIOS (CERRAR) ======== */
+/* ============================================================ */
+
+/* Estilo general para botones que no son la acción principal */
 .secondary-button {
     background: none;
     border: none;
     color: var(--secondary-text-color);
-    font-weight: 600;
-    padding: 10px;
+    font-weight: 700;
+    font-size: 0.95em;
+    padding: 10px 20px;
     cursor: pointer;
     margin-top: 10px;
+    border-radius: 20px;
+    transition: all 0.2s ease;
 }
+
+/* Efecto al pasar el ratón por encima */
 .secondary-button:hover {
+    background-color: var(--border-color);
     color: var(--text-color);
 }
