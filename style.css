@@ -353,33 +353,74 @@ input, select { padding: 12px; border: 1px solid var(--border-color); border-rad
     margin: 0 0 25px 0;
 }
 
-.telegram-prompt-modal {
-    background-color: #f0f7ff;
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 25px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
+/* --- Estilos para la Vista de Éxito en el Modal --- */
+#result-success-view {
     text-align: center;
+    padding: 10px 0;
 }
 
-.telegram-prompt-modal span {
-    font-size: 0.95em;
+.success-icon {
+    font-size: 3em;
+    margin-bottom: 10px;
+}
+
+#result-success-view h2 {
+    color: var(--primary-color);
+    margin: 0 0 20px 0;
+}
+
+/* Contenedor principal del prompt de Telegram */
+.telegram-prompt-modal {
+    background-color: #f7f9fc;
+    border: 1px solid #e3eaf3;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.telegram-prompt-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1em;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.telegram-prompt-modal p {
+    font-size: 0.9em;
     line-height: 1.5;
+    color: var(--secondary-text-color);
+    margin: 10px 0 20px 0;
 }
 
-.telegram-prompt-modal a {
+.telegram-prompt-modal-button {
+    display: block;
     background-color: #3498db;
     color: #fff;
-    padding: 8px 20px;
-    border-radius: 20px;
+    padding: 12px;
+    border-radius: 10px;
     text-decoration: none;
     font-weight: 600;
+    text-align: center;
     transition: background-color 0.2s ease;
 }
 
-.telegram-prompt-modal a:hover {
+.telegram-prompt-modal-button:hover {
     background-color: #2980b9;
+}
+
+/* Botón secundario para "Cerrar" */
+.secondary-button {
+    background: none;
+    border: none;
+    color: var(--secondary-text-color);
+    font-weight: 600;
+    padding: 10px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.secondary-button:hover {
+    color: var(--text-color);
 }

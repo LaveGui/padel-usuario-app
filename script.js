@@ -35,6 +35,11 @@ function initLeagueTab() {
     document.getElementById('team-filter').addEventListener('change', handleTeamSelection);
     document.getElementById('result-form').addEventListener('submit', submitMatchResult);
     document.getElementById('modal-close-btn').addEventListener('click', () => document.getElementById('result-modal').classList.add('hidden'));
+
+    // --- NUEVO: Listener para el botón "Cerrar" de la vista de éxito ---
+    document.getElementById('modal-success-close-btn').addEventListener('click', () => {
+        document.getElementById('result-modal').classList.add('hidden');
+    });
     
     document.querySelectorAll('.zone-button').forEach(button => {
         button.addEventListener('click', () => {
@@ -45,19 +50,15 @@ function initLeagueTab() {
         });
     });
 
-    // --- NUEVA LÓGICA PARA EL ACORDEÓN ---
     const accordionHeader = document.querySelector('.accordion-header');
     if (accordionHeader) {
         accordionHeader.addEventListener('click', (event) => {
-            // Evitamos que el clic en el botón de "Unirse" también expanda/colapse
             if (event.target.closest('.telegram-button')) {
                 return;
             }
-            // Añadimos o quitamos la clase 'expanded' al contenedor principal
             accordionHeader.parentElement.classList.toggle('expanded');
         });
     }
-    // --- FIN DE LA NUEVA LÓGICA ---
 
     fetchAndRenderLeague();
 }
