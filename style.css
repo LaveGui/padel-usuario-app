@@ -198,15 +198,74 @@ input, select { padding: 12px; border: 1px solid var(--border-color); border-rad
 }
 
 
+/* ============================================================ */
+/* ========= ESTILOS PARA TARJETAS DE ESTADÍSTICAS ============ */
+/* ============================================================ */
+
 .stats-cards {
-    /* Modificado para que quepan 4 columnas */
-    grid-template-columns: repeat(4, 1fr); 
-    gap: 10px; /* Reducimos el espacio para que quepa mejor en móviles */
+    display: grid;
+    /* Esto crea 3 columnas con espacio igual */
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 15px; /* Espacio entre las tarjetas */
     margin-top: 20px;
+    margin-bottom: 20px; /* Añadimos un poco de margen inferior */
+    /* Aseguramos que se ajusten bien en pantallas muy pequeñas */
+    grid-auto-rows: minmax(80px, auto); 
 }
+
+.stat-card {
+    background-color: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    display: flex; /* Usamos flexbox para centrar contenido verticalmente */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 80px; /* Altura mínima para que no se deformen */
+}
+
+.stat-card span {
+    font-size: 0.8em;
+    color: var(--secondary-text-color);
+    margin-bottom: 5px;
+}
+
 .stat-card strong {
-    font-size: 1.6em; /* Un poco más pequeño para acomodar el texto y los iconos */
+    font-size: 1.8em;
+    color: var(--text-color);
+    font-weight: 800;
+    line-height: 1.1; /* Ajuste de línea para que no haya demasiado espacio */
 }
+
+/* Contenedor especial para la tarjeta de posición (para la evolución) */
+#stat-posicion-card div {
+    display: flex;
+    align-items: baseline; /* Alinea la base del número y el indicador */
+    justify-content: center;
+    gap: 8px; /* Espacio entre el número y la evolución */
+}
+
+/* Indicador de evolución (más pequeño y al lado) */
+.evolution-indicator {
+    font-size: 0.8em;
+    font-weight: 700;
+    display: inline-block;
+}
+
+/* Colores para el indicador de evolución */
+.evolution-indicator.positive {
+    color: #2ecc71; /* Verde */
+}
+.evolution-indicator.negative {
+    color: #e74c3c; /* Rojo */
+}
+.evolution-indicator.neutral {
+    color: var(--secondary-text-color); /* Gris */
+}
+
 
 
 /* --- Estilos para las invitaciones a Telegram --- */
@@ -443,13 +502,7 @@ input, select { padding: 12px; border: 1px solid var(--border-color); border-rad
 /* ========= ESTILOS PARA TARJETAS DE ESTADÍSTICAS ============ */
 /* ============================================================ */
 
-.stats-cards {
-    display: grid;
-    /* Cambiamos a 3 columnas */
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin-top: 20px;
-}
+
 
 /* Contenedor especial para la tarjeta de posición */
 #stat-posicion-card div {
