@@ -251,7 +251,6 @@ function handleTeamSelection(event) {
     const teamData = leagueData.clasificacion.find(t => t.Numero == selectedTeamId);
     if (!teamData) return;
 
-    // ... (Lógica del enlace dinámico de Telegram, sin cambios) ...
     const teamNameForUrl = teamData.Pareja.replace(/\s+/g, '-');
     const dynamicUrl = `https://t.me/PadelGuido1_bot?start=liga_team_${teamData.Numero}_${teamNameForUrl}`;
     document.getElementById('telegram-link-liga').href = dynamicUrl;
@@ -265,7 +264,6 @@ function handleTeamSelection(event) {
         const teamsInCurrentZone = leagueData.clasificacion.filter(t => t.Zona === currentZone);
         const teamPosition = teamsInCurrentZone.findIndex(t => t.Numero == selectedTeamId) + 1;
         
-        // --- INICIO DE LA LÓGICA ACTUALIZADA ---
         document.getElementById('stat-posicion').textContent = `#${teamPosition}`;
         document.getElementById('stat-puntos').textContent = teamData.Puntos;
         
@@ -277,7 +275,7 @@ function handleTeamSelection(event) {
 
         // Reseteamos clases y contenido
         evolucionEl.className = 'evolution-indicator';
-        evolucionEl.textContent = '';
+        evolucionEl.textContent = ''; // Limpiar el texto si no hay cambio o para empezar
 
         if (positionChange > 0) {
             evolucionEl.textContent = `▲ +${positionChange}`;
@@ -286,10 +284,8 @@ function handleTeamSelection(event) {
             evolucionEl.textContent = `▼ ${positionChange}`;
             evolucionEl.classList.add('negative');
         } else {
-            // Si no hay cambio, no mostramos nada para mantenerlo limpio
-            evolucionEl.textContent = '';
+            // Si no hay cambio, el texto se mantiene vacío, lo cual es lo deseado
         }
-        // --- FIN DE LA LÓGICA ACTUALIZADA ---
 
         statsContainer.classList.remove('hidden');
         telegramPrompt.classList.remove('hidden');

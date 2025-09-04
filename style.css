@@ -197,15 +197,79 @@ input, select { padding: 12px; border: 1px solid var(--border-color); border-rad
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
+/* ============================================================ */
+/* ========= ESTILOS PARA TARJETAS DE ESTADÍSTICAS ============ */
+/* ============================================================ */
 
 .stats-cards {
-    /* Modificado para que quepan 4 columnas */
-    grid-template-columns: repeat(4, 1fr); 
-    gap: 10px; /* Reducimos el espacio para que quepa mejor en móviles */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columnas iguales */
+    gap: 15px; /* Espacio entre las tarjetas */
     margin-top: 20px;
+    margin-bottom: 20px;
+    grid-auto-rows: minmax(80px, auto); /* Altura mínima para filas */
 }
+
+.stat-card {
+    background-color: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 15px 10px; /* Ajuste el padding horizontal */
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 80px;
+}
+
+.stat-card span {
+    font-size: 0.8em;
+    color: var(--secondary-text-color);
+    margin-bottom: 5px;
+    white-space: nowrap; /* Evita que el texto del span se rompa */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .stat-card strong {
-    font-size: 1.6em; /* Un poco más pequeño para acomodar el texto y los iconos */
+    font-size: 1.8em;
+    color: var(--text-color);
+    font-weight: 800;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+/* Contenedor para agrupar Posición y Evolución */
+.position-evolution-group {
+    display: flex;
+    align-items: flex-end; /* Alinea la parte inferior de los textos */
+    justify-content: center;
+    gap: 5px; /* Espacio entre el número de posición y el indicador de evolución */
+    line-height: 1; /* Para evitar espacios extra verticales */
+}
+
+/* Estilo para el indicador de evolución dentro del grupo */
+.evolution-indicator {
+    font-size: 0.9em; /* Ligeramente más grande que antes */
+    font-weight: 700;
+    display: inline-block;
+    padding-bottom: 2px; /* Pequeño ajuste para alineación visual */
+}
+
+/* Colores para el indicador de evolución */
+.evolution-indicator.positive {
+    color: #2ecc71; /* Verde */
+}
+.evolution-indicator.negative {
+    color: #e74c3c; /* Rojo */
+}
+/* No necesitamos un .neutral si no mostramos nada para 0 */
+
+/* Ajuste para el strong dentro del grupo, si es necesario */
+.position-evolution-group strong {
+    margin-bottom: 0;
 }
 
 
@@ -318,27 +382,34 @@ input, select { padding: 12px; border: 1px solid var(--border-color); border-rad
 }
 
 /* --- Estilos para la Vista de Éxito en el Modal --- */
-#result-success-view {
-    text-align: center;
-    padding: 20px 0;
-}
+
 
 .success-icon {
     font-size: 3em;
     margin-bottom: 15px;
 }
 
-#result-success-view h2 {
-    color: var(--primary-color);
-    margin: 0 0 10px 0;
-}
 
-#result-success-view p {
-    color: var(--secondary-text-color);
-    margin: 0 0 25px 0;
-}
+
+
 
 /* --- Estilos para la Vista de Éxito en el Modal --- */
+
+
+.success-icon {
+    font-size: 3em;
+    margin-bottom: 10px;
+}
+
+
+
+
+
+/* =============================================================== */
+/* === ESTILOS DEFINITIVOS PARA EL MODAL DE RESULTADO GUARDADO === */
+/* =============================================================== */
+
+/* --- Contenedor Principal de la Vista de Éxito --- */
 #result-success-view {
     text-align: center;
     padding: 10px 0;
@@ -354,7 +425,7 @@ input, select { padding: 12px; border: 1px solid var(--border-color); border-rad
     margin: 0 0 20px 0;
 }
 
-/* Contenedor principal del prompt de Telegram */
+/* --- Tarjeta de Invitación a Telegram --- */
 .telegram-prompt-modal {
     background-color: #f7f9fc;
     border: 1px solid #e3eaf3;
@@ -373,6 +444,12 @@ input, select { padding: 12px; border: 1px solid var(--border-color); border-rad
     color: var(--text-color);
 }
 
+.telegram-prompt-modal-header svg {
+    fill: #3498db; /* Azul de Telegram */
+    width: 24px;
+    height: 24px;
+}
+
 .telegram-prompt-modal p {
     font-size: 0.9em;
     line-height: 1.5;
@@ -380,38 +457,34 @@ input, select { padding: 12px; border: 1px solid var(--border-color); border-rad
     margin: 10px 0 20px 0;
 }
 
-/* --- Estilos para el Botón principal de Telegram en el modal --- */
+/* --- Botón Principal de Telegram (Azul) --- */
 .telegram-modal-main-button {
-    display: flex; /* Para centrar el icono y el texto */
+    display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px; /* Espacio entre icono y texto */
-    background-color: #3498db; /* Azul de Telegram */
+    gap: 8px;
+    background-color: #3498db;
     color: #fff;
     padding: 12px;
     border-radius: 10px;
     text-decoration: none;
     font-weight: 600;
-    width: 100%; /* Para que ocupe todo el ancho disponible */
-    box-sizing: border-box; /* Para que el padding no añada ancho */
+    width: 100%;
+    box-sizing: border-box;
     transition: background-color 0.2s ease;
 }
 
 .telegram-modal-main-button:hover {
-    background-color: #2980b9; /* Azul más oscuro al pasar el ratón */
+    background-color: #2980b9;
 }
 
 .telegram-modal-main-button svg {
-    fill: #fff; /* Icono blanco */
-    width: 20px; /* Tamaño del icono */
+    fill: #fff;
+    width: 20px;
     height: 20px;
 }
 
-/* ============================================================ */
-/* ========= ESTILOS PARA BOTONES SECUNDARIOS (CERRAR) ======== */
-/* ============================================================ */
-
-/* Estilo general para botones que no son la acción principal */
+/* --- Botón Secundario (Cerrar) --- */
 .secondary-button {
     background: none;
     border: none;
@@ -425,7 +498,6 @@ input, select { padding: 12px; border: 1px solid var(--border-color); border-rad
     transition: all 0.2s ease;
 }
 
-/* Efecto al pasar el ratón por encima */
 .secondary-button:hover {
     background-color: var(--border-color);
     color: var(--text-color);
@@ -435,13 +507,7 @@ input, select { padding: 12px; border: 1px solid var(--border-color); border-rad
 /* ========= ESTILOS PARA TARJETAS DE ESTADÍSTICAS ============ */
 /* ============================================================ */
 
-.stats-cards {
-    display: grid;
-    /* Cambiamos a 3 columnas */
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin-top: 20px;
-}
+
 
 /* Contenedor especial para la tarjeta de posición */
 #stat-posicion-card div {
