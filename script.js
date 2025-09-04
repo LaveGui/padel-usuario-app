@@ -30,26 +30,35 @@ document.addEventListener('DOMContentLoaded', () => {
 // ============================================================
 // ========= PESTAÑA "LIGA" ===================================
 // ============================================================
+
 function initLeagueTab() {
     document.getElementById('team-filter').addEventListener('change', handleTeamSelection);
     document.getElementById('result-form').addEventListener('submit', submitMatchResult);
     document.getElementById('modal-close-btn').addEventListener('click', () => document.getElementById('result-modal').classList.add('hidden'));
+
+    // --- NUEVO: Listener para el botón "Cerrar" de la vista de éxito ---
+    document.getElementById('modal-success-close-btn').addEventListener('click', () => {
+        document.getElementById('result-modal').classList.add('hidden');
+    });
     
-    // --- ESTA ES LA PARTE CORREGIDA ---
-    // Ahora, al hacer clic en un botón de zona, llamamos a renderZoneView
-    // pasándole los datos de la liga para que pueda redibujar la tabla.
-    // Pasamos 'null' como segundo parámetro porque al cambiar de grupo no queremos
-    // comparar posiciones ni mostrar flechas.
     document.querySelectorAll('.zone-button').forEach(button => {
         button.addEventListener('click', () => {
             currentZone = button.dataset.zone;
-            // Aseguramos que leagueData exista antes de intentar renderizar
             if (leagueData && leagueData.clasificacion) {
                 renderZoneView(leagueData, null); 
             }
         });
     });
-    // --- FIN DE LA CORRECCIÓN ---
+
+    const accordionHeader = document.querySelector('.accordion-header');
+    if (accordionHeader) {
+        accordionHeader.addEventListener('click', (event) => {
+            if (event.target.closest('.telegram-button')) {
+                return;
+            }
+            accordionHeader.parentElement.classList.toggle('expanded');
+        });
+    }
 
     fetchAndRenderLeague();
 }
@@ -229,69 +238,75 @@ function renderMatchesList(matches) { // La función ahora recibe datos ya filtr
 function handleTeamSelection(event) {
     const selectedTeamId = event.target.value;
     const statsContainer = document.getElementById('stats-cards-container');
+    const telegramPrompt = document.getElementById('telegram-prompt-liga');
     
-    // Limpiamos highlights anteriores
     document.querySelectorAll('#classification-table-body tr, .match-item').forEach(el => el.classList.remove('highlight'));
     
     if (!selectedTeamId) {
         statsContainer.classList.add('hidden');
+        telegramPrompt.classList.add('hidden');
         return;
     }
 
-    // LÓGICA DE CAMBIO AUTOMÁTICO DE ZONA
     const teamData = leagueData.clasificacion.find(t => t.Numero == selectedTeamId);
-    if (teamData && teamData.Zona !== currentZone) {
+    if (!teamData) return;
+
+    // ... (Lógica del enlace dinámico de Telegram, sin cambios) ...
+    const teamNameForUrl = teamData.Pareja.replace(/\s+/g, '-');
+    const dynamicUrl = `https://t.me/PadelGuido1_bot?start=liga_team_${teamData.Numero}_${teamNameForUrl}`;
+    document.getElementById('telegram-link-liga').href = dynamicUrl;
+
+    if (teamData.Zona !== currentZone) {
         currentZone = teamData.Zona;
-        renderZoneView(leagueData.clasificacion, leagueData.clasificacion); // Pasamos datos para mantener la lógica de las flechas
+        renderZoneView(leagueData, null);
     }
     
-    // Esperamos un instante para que el DOM se actualice con la nueva zona si ha cambiado
     setTimeout(() => {
         const teamsInCurrentZone = leagueData.clasificacion.filter(t => t.Zona === currentZone);
         const teamPosition = teamsInCurrentZone.findIndex(t => t.Numero == selectedTeamId) + 1;
         
-        if(teamData) {
-            const totalMatchesForZone = teamsInCurrentZone.length - 1;
-            
-            document.getElementById('stat-posicion').textContent = `#${teamPosition}`;
-            document.getElementById('stat-puntos').textContent = teamData.Puntos;
-            document.getElementById('stat-partidos').textContent = `${teamData.PJ}/${totalMatchesForZone}`;
-            
-            // --- INICIO DE LA NUEVA LÓGICA DE EVOLUCIÓN ---
-            const evolucionEl = document.getElementById('stat-evolucion');
-            const positionChange = teamData.positionChange;
+        // --- INICIO DE LA LÓGICA ACTUALIZADA ---
+        document.getElementById('stat-posicion').textContent = `#${teamPosition}`;
+        document.getElementById('stat-puntos').textContent = teamData.Puntos;
+        
+        const totalMatchesForZone = teamsInCurrentZone.length - 1;
+        document.getElementById('stat-partidos').textContent = `${teamData.PJ}/${totalMatchesForZone}`;
+        
+        const evolucionEl = document.getElementById('stat-evolucion');
+        const positionChange = teamData.positionChange;
 
-            // Reseteamos las clases de color
-            evolucionEl.classList.remove('positive', 'negative', 'neutral');
+        // Reseteamos clases y contenido
+        evolucionEl.className = 'evolution-indicator';
+        evolucionEl.textContent = '';
 
-            if (positionChange > 0) {
-                evolucionEl.textContent = `▲ +${positionChange}`;
-                evolucionEl.classList.add('positive');
-            } else if (positionChange < 0) {
-                // Math.abs para quitar el doble signo negativo
-                evolucionEl.textContent = `▼ -${Math.abs(positionChange)}`;
-                evolucionEl.classList.add('negative');
-            } else {
-                evolucionEl.textContent = '▬'; // Icono para "sin cambios"
-                evolucionEl.classList.add('neutral');
-            }
-            // --- FIN DE LA NUEVA LÓGICA ---
-
-            statsContainer.classList.remove('hidden');
+        if (positionChange > 0) {
+            evolucionEl.textContent = `▲ +${positionChange}`;
+            evolucionEl.classList.add('positive');
+        } else if (positionChange < 0) {
+            evolucionEl.textContent = `▼ ${positionChange}`;
+            evolucionEl.classList.add('negative');
+        } else {
+            // Si no hay cambio, no mostramos nada para mantenerlo limpio
+            evolucionEl.textContent = '';
         }
+        // --- FIN DE LA LÓGICA ACTUALIZADA ---
 
-        // Mostrar highlights en la zona correcta
+        statsContainer.classList.remove('hidden');
+        telegramPrompt.classList.remove('hidden');
+        
         document.querySelector(`#classification-table-body tr[data-team-id='${selectedTeamId}']`)?.classList.add('highlight');
         document.querySelectorAll(`.match-item[data-team1-id='${selectedTeamId}'], .match-item[data-team2-id='${selectedTeamId}']`).forEach(el => el.classList.add('highlight'));
-    }, 100); // Pequeña demora para asegurar que la vista se ha renderizado
+    }, 100);
 }
-
-
 
 
 
 function openResultModal(matchId, team1Name, team2Name) {
     const modal = document.getElementById('result-modal');
+    // --- LÓGICA MEJORADA ---
+    // Nos aseguramos de que al abrir, siempre se vea el formulario y no la vista de éxito
+    document.getElementById('result-form-view').classList.remove('hidden');
+    document.getElementById('result-success-view').classList.add('hidden');
     document.getElementById('result-form').reset();
     document.getElementById('result-form-status').textContent = '';
     
@@ -308,6 +323,10 @@ async function submitMatchResult(event) {
     statusDiv.textContent = 'Guardando...';
     statusDiv.style.color = '#555';
 
+    // --- LÓGICA MEJORADA: Paso 1 - Guardamos el contexto actual ---
+    const teamFilter = document.getElementById('team-filter');
+    const selectedTeamIdBeforeSubmit = teamFilter.value;
+
     const data = {
         partidoId: document.getElementById('match-id-input').value,
         set1_p1: document.getElementById('set1_p1').value, set1_p2: document.getElementById('set1_p2').value,
@@ -321,11 +340,27 @@ async function submitMatchResult(event) {
             body: JSON.stringify({ action: 'addMatchResult', data: data })
         });
         const result = await response.json();
+        
         if (result.success) {
-            leagueData = result.data; // Actualizamos los datos de la liga
-            renderClassificationTable(leagueData.clasificacion);
-            renderMatchesList(leagueData.partidos);
-            document.getElementById('result-modal').classList.add('hidden');
+            // --- LÓGICA MEJORADA: Paso 2 - Actualizamos datos y mostramos éxito ---
+            const cachedData = JSON.parse(localStorage.getItem('padelLeagueData') || '{}');
+            leagueData = result.data;
+            localStorage.setItem('padelLeagueData', JSON.stringify(leagueData));
+            
+            // Renderizamos la tabla de fondo con los datos nuevos
+            renderZoneView(leagueData, cachedData);
+
+            // Mostramos la vista de éxito
+            document.getElementById('result-form-view').classList.add('hidden');
+            document.getElementById('result-success-view').classList.remove('hidden');
+
+            // --- LÓGICA MEJORADA: Paso 3 - Restauramos el contexto ---
+            if (selectedTeamIdBeforeSubmit) {
+                teamFilter.value = selectedTeamIdBeforeSubmit;
+                // Disparamos el evento 'change' para que se actualicen las tarjetas y highlights
+                teamFilter.dispatchEvent(new Event('change'));
+            }
+
         } else {
             throw new Error(result.error);
         }
