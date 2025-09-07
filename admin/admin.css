@@ -55,20 +55,26 @@ header p { color: var(--secondary-text-color); font-weight: 600; }
 .leader-group li .team-stats { font-size: 0.85em; color: var(--secondary-text-color); }
 
 /* ============================================================ */
-/* ========= SECCIÓN ÚLTIMOS PARTIDOS (DISEÑO MEJORADO) ======== */
+/* ========= SECCIÓN ÚLTIMOS PARTIDOS (DISEÑO COMPACTO) ======== */
 /* ============================================================ */
+
+.last-matches-card h2 {
+    text-align: center;
+    margin: 0 0 25px 0;
+    color: var(--primary-color);
+}
 
 #last-updated-matches-list {
     display: grid;
     grid-template-columns: 1fr; /* Una columna para la lista */
-    gap: 15px;
+    gap: 12px;
 }
 
 .last-match-card {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 14px;
-    padding: 20px;
+    padding: 15px 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     display: flex;
     justify-content: space-between;
@@ -79,26 +85,21 @@ header p { color: var(--secondary-text-color); font-weight: 600; }
 .last-match-card .match-details {
     display: flex;
     flex-direction: column;
-    gap: 5px; /* Espacio entre los textos */
+    gap: 2px; /* Espacio mínimo entre nombre y resultado */
     flex-grow: 1;
 }
 
 .last-match-card .teams {
-    font-weight: 700;
-    font-size: 1.1em;
+    font-weight: 600;
+    font-size: 1em;
     color: var(--text-color);
-    line-height: 1.3;
+    line-height: 1.4;
 }
 
 .last-match-card .result {
-    font-weight: 600;
-    font-size: 1em;
+    font-weight: 700;
+    font-size: 1.1em;
     color: var(--primary-color);
-}
-
-.last-match-card .timestamp {
-    font-size: 0.8em;
-    color: var(--secondary-text-color);
 }
 
 .last-match-card .match-actions {
@@ -319,6 +320,4 @@ tr:hover { background-color: #f8f9fa; }
     .match-filters { flex-direction: column; align-items: stretch; }
     .filter-group { justify-content: center; }
     .last-match-card { flex-direction: column; align-items: flex-start; }
-    .last-match-card .match-details { margin-bottom: 15px; }
-    .last-match-card .match-actions { align-self: flex-end; }
 }

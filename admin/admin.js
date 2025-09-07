@@ -110,12 +110,11 @@ function renderLastUpdatedMatches(matches) {
             const matchCard = document.createElement('div');
             matchCard.className = 'last-match-card';
             
-            // Estructura HTML que coincide con el nuevo diseño
+            // Nueva estructura HTML, más compacta y sin fecha/hora
             matchCard.innerHTML = `
                 <div class="match-details">
                     <p class="teams">${match.pareja1} vs ${match.pareja2}</p>
                     <p class="result">${match.resultado}</p>
-                    <p class="timestamp">Registrado: ${match.timestamp}</p>
                 </div>
                 <div class="match-actions">
                     <button class="action-btn edit" title="Editar Resultado" data-match-id="${match.id}">✏️</button>
@@ -125,7 +124,7 @@ function renderLastUpdatedMatches(matches) {
             container.appendChild(matchCard);
         });
 
-        // Volvemos a asignar los listeners a los nuevos botones
+        // Reasignamos los listeners a los nuevos botones
         document.querySelectorAll('#last-updated-matches-list .edit').forEach(btn => {
             btn.addEventListener('click', (e) => openResultModal(e.target.closest('.action-btn').dataset.matchId));
         });
