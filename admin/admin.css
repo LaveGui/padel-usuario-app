@@ -59,27 +59,31 @@ header p { color: var(--secondary-text-color); font-weight: 600; }
 #last-updated-matches-list .match-item {
     background: #fdfdfd;
     border: 1px solid #e0e6ed;
-    padding: 12px 18px;
+    padding: 15px 18px; /* Aumentado padding para más aire */
     border-radius: 10px;
     margin-bottom: 8px;
     display: flex;
+    flex-wrap: wrap; /* Permitir que los elementos se envuelvan en pantallas pequeñas */
     justify-content: space-between;
     align-items: center;
     font-size: 0.95em;
     box-shadow: 0 2px 5px rgba(0,0,0,0.03);
 }
 #last-updated-matches-list .match-info {
-    flex-grow: 1;
+    flex-grow: 1; /* Permitir que la info de partido ocupe el espacio disponible */
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Apilar parejas y resultado */
+    min-width: 180px; /* Asegurar un ancho mínimo para la información principal */
+    margin-right: 15px; /* Espacio entre la info y las acciones/fecha */
 }
 #last-updated-matches-list .match-info .teams {
     font-weight: 600;
     margin-bottom: 3px;
     color: var(--text-color);
+    line-height: 1.2; /* Ajuste de altura de línea para nombres largos */
 }
 #last-updated-matches-list .match-info .result-status {
-    font-size: 0.9em;
+    font-size: 1em; /* Un poco más grande para el resultado */
     color: var(--primary-color);
     font-weight: 700;
 }
@@ -90,13 +94,41 @@ header p { color: var(--secondary-text-color); font-weight: 600; }
 #last-updated-matches-list .match-date {
     font-size: 0.8em;
     color: var(--secondary-text-color);
-    margin-left: 15px;
-    white-space: nowrap; /* Evita que la fecha se rompa en varias líneas */
+    white-space: nowrap;
+    text-align: right; /* Alineamos la fecha a la derecha */
+    margin-left: auto; /* Empuja la fecha a la derecha si hay espacio */
+    margin-right: 15px; /* Espacio antes de los botones */
+    line-height: 1.2;
 }
 #last-updated-matches-list .match-actions {
-    margin-left: 10px; /* Espacio entre fecha y botones */
+    display: flex; /* Para que los botones estén uno al lado del otro */
+    gap: 5px; /* Pequeño espacio entre botones */
+    flex-shrink: 0; /* Evitar que los botones se encojan */
 }
 
+/* Media query para pantallas pequeñas (si es necesario un ajuste más específico) */
+@media (max-width: 480px) {
+    #last-updated-matches-list .match-item {
+        flex-direction: column; /* Apilar elementos en pantallas muy pequeñas */
+        align-items: flex-start;
+    }
+    #last-updated-matches-list .match-info {
+        margin-right: 0;
+        margin-bottom: 10px;
+        width: 100%; /* Ocupar todo el ancho */
+    }
+    #last-updated-matches-list .match-date {
+        margin-left: 0;
+        margin-right: 0;
+        width: 100%;
+        text-align: left; /* Alineamos la fecha a la izquierda en móvil */
+        margin-bottom: 10px;
+    }
+    #last-updated-matches-list .match-actions {
+        width: 100%;
+        justify-content: flex-start; /* Alinea los botones a la izquierda */
+    }
+}
 
 /* Management Section */
 .tabs { display: flex; background-color: #e9ecef; padding: 5px; border-radius: 25px; margin-bottom: 30px; }

@@ -109,7 +109,7 @@ function renderLastUpdatedMatches(matches) {
             const matchItem = document.createElement('div');
             matchItem.className = 'match-item';
             
-            const resultHtml = match.estado === 'Jugado' ? `<strong>${match.resultado}</strong>` : `<span class="result pending">Pendiente</span>`;
+            const resultHtml = match.estado === 'Jugado' ? `<strong>${match.resultado}</strong>` : `<span class="result-status pending">Pendiente</span>`;
 
             matchItem.innerHTML = `
                 <div class="match-info">
@@ -133,7 +133,7 @@ function renderLastUpdatedMatches(matches) {
         });
 
     } else {
-        container.innerHTML = '<p>No hay partidos registrados recientemente.</p>';
+        container.innerHTML = '<p style="text-align: center; color: var(--secondary-text-color);">No hay partidos registrados recientemente.</p>';
     }
 }
 
