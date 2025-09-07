@@ -54,59 +54,6 @@ header p { color: var(--secondary-text-color); font-weight: 600; }
 .leader-group li .team-name { font-size: 1.1em; color: var(--primary-color); margin-bottom: 3px;}
 .leader-group li .team-stats { font-size: 0.85em; color: var(--secondary-text-color); }
 
-/* ============================================================ */
-/* ========= SECCIÓN ÚLTIMOS PARTIDOS (DISEÑO COMPACTO) ======== */
-/* ============================================================ */
-
-.last-matches-card h2 {
-    text-align: center;
-    margin: 0 0 25px 0;
-    color: var(--primary-color);
-}
-
-#last-updated-matches-list {
-    display: grid;
-    grid-template-columns: 1fr; /* Una columna para la lista */
-    gap: 12px;
-}
-
-.last-match-card {
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 14px;
-    padding: 15px 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 15px;
-}
-
-.last-match-card .match-details {
-    display: flex;
-    flex-direction: column;
-    gap: 2px; /* Espacio mínimo entre nombre y resultado */
-    flex-grow: 1;
-}
-
-.last-match-card .teams {
-    font-weight: 600;
-    font-size: 1em;
-    color: var(--text-color);
-    line-height: 1.4;
-}
-
-.last-match-card .result {
-    font-weight: 700;
-    font-size: 1.1em;
-    color: var(--primary-color);
-}
-
-.last-match-card .match-actions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
 
 /* Management Section */
 .tabs { display: flex; background-color: #e9ecef; padding: 5px; border-radius: 25px; margin-bottom: 30px; }

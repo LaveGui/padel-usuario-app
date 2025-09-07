@@ -107,24 +107,36 @@ function renderLastUpdatedMatches(matches) {
     
     if (matches && matches.length > 0) {
         matches.forEach(match => {
-            const matchCard = document.createElement('div');
-            matchCard.className = 'last-match-card';
+            const matchEl = document.createElement('div'); // Cambiado a matchEl para consistencia
+            matchEl.className = 'match-item'; // Usamos la misma clase que en gestión de partidos
             
-            // Nueva estructura HTML, más compacta y sin fecha/hora
-            matchCard.innerHTML = `
-                <div class="match-details">
-                    <p class="teams">${match.pareja1} vs ${match.pareja2}</p>
-                    <p class="result">${match.resultado}</p>
+            const team1Name = `<span>${match.pareja1}</span>`; // Sin negrita por defecto aquí
+            const team2Name = `<span>${match.pareja2}</span>`; // Sin negrita por defecto aquí
+
+            let resultHtml;
+            // Aquí simulamos el mismo comportamiento de resultado y botones
+            // que en la sección de "Gestión de Partidos".
+            if (match.estado === 'Jugado') {
+                resultHtml = `<div class="result">${match.resultado}</div>`;
+            } else {
+                // Si el partido está Pendiente, muestra "Pendiente" en lugar del resultado
+                resultHtml = `<div class="result pending">Pendiente</div>`;
+            }
+            
+            matchEl.innerHTML = `
+                <div class="match-info-display">
+                    <div class="teams">${team1Name} vs ${team2Name}</div>
+                    ${resultHtml}
                 </div>
                 <div class="match-actions">
                     <button class="action-btn edit" title="Editar Resultado" data-match-id="${match.id}">✏️</button>
                     <button class="action-btn delete" title="Eliminar Resultado" data-match-id="${match.id}">🗑️</button>
                 </div>
             `;
-            container.appendChild(matchCard);
+            container.appendChild(matchEl);
         });
 
-        // Reasignamos los listeners a los nuevos botones
+        // Reasignamos los listeners a los botones generados
         document.querySelectorAll('#last-updated-matches-list .edit').forEach(btn => {
             btn.addEventListener('click', (e) => openResultModal(e.target.closest('.action-btn').dataset.matchId));
         });
