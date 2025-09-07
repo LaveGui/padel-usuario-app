@@ -17,6 +17,13 @@
         </header>
 
         <main>
+            <section class="card last-matches-card">
+                <h2>Últimos Partidos Registrados</h2>
+                <div id="last-updated-matches-list">
+                    <p>Cargando últimos partidos...</p>
+                </div>
+            </section>
+
             <section class="card dashboard">
                 <div class="stat-card">
                     <span>Progreso de la Fase</span>
@@ -31,6 +38,7 @@
                     <strong id="stat-partidos-b">-/-</strong>
                 </div>
             </section>
+            
             <section class="card leaders-card">
                 <h2>Líderes Actuales</h2>
                 <div class="leaders-grid">
@@ -44,14 +52,7 @@
                     </div>
                 </div>
             </section>
-
-            <section class="card last-matches-card">
-                <h2>Últimos Partidos Registrados</h2>
-                <div id="last-updated-matches-list">
-                    <p>Cargando últimos partidos...</p>
-                </div>
-            </section>
-
+            
             <section class="management-section">
                 <div class="tabs">
                     <button class="tab-button active" data-tab="partidos">Gestión de Partidos</button>
@@ -59,6 +60,20 @@
                 </div>
 
                 <div id="tab-content-partidos" class="tab-content active">
+                    <div class="match-filters">
+                        <div class="filter-group">
+                            <label>Grupo:</label>
+                            <button class="filter-button active" data-filter-type="zona" data-filter-value="all">Todos</button>
+                            <button class="filter-button" data-filter-type="zona" data-filter-value="A">Grupo A</button>
+                            <button class="filter-button" data-filter-type="zona" data-filter-value="B">Grupo B</button>
+                        </div>
+                        <div class="filter-group">
+                            <label>Estado:</label>
+                            <button class="filter-button active" data-filter-type="estado" data-filter-value="all">Todos</button>
+                            <button class="filter-button" data-filter-type="estado" data-filter-value="Pendiente">Pendientes</button>
+                            <button class="filter-button" data-filter-type="estado" data-filter-value="Jugado">Finalizados</button>
+                        </div>
+                    </div>
                     <div id="matches-list-container"></div>
                 </div>
 

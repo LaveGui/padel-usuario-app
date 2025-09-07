@@ -3,7 +3,9 @@ const API_URL = "/api/data"; // Debería apuntar a tu API de Apps Script
 
 // --- ESTADO GLOBAL ---
 let leagueData = {};
-let currentZone = 'A';
+let currentZoneClassification = 'A'; // Para la tabla de clasificación
+let currentFilterZone = 'all'; // Para la gestión de partidos
+let currentFilterEstado = 'all'; // Para la gestión de partidos
 
 // --- INICIALIZACIÓN ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -16,11 +18,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Listeners de Filtro de Zona
-    document.querySelectorAll('.zone-button').forEach(button => {
+    // Listeners de Filtro de Zona (Clasificación)
+    document.querySelectorAll('.zone-selector .zone-button').forEach(button => {
         button.addEventListener('click', () => {
-            currentZone = button.dataset.zone;
-            renderZoneView();
+            currentZoneClassification = button.dataset.zone;
+            renderClassificationTable();
+        });
+    });
+
+    // Listeners de Filtro de Partidos (Gestión de Partidos)
+    document.querySelectorAll('.match-filters .filter-button').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const filterType = e.target.dataset.filterType;
+            const filterValue = e.target.dataset.filterValue;
+
+            // Remover 'active' de todos los botones del mismo tipo
+            document.querySelectorAll(`.filter-button[data-filter-type="${filterType}"]`).forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+
+            if (filterType === 'zona') {
+                currentFilterZone = filterValue;
+            } else if (filterType === 'estado') {
+                currentFilterEstado = filterValue;
+            }
+            renderMatchesList(); // Volver a renderizar la lista con los nuevos filtros
         });
     });
     
@@ -38,13 +59,13 @@ async function fetchAllData() {
     try {
         const [dashboardRes, leagueRes] = await Promise.all([
             fetch(`${API_URL}?endpoint=getAdminDashboardData`),
-            fetch(`${API_URL}?endpoint=getLeagueData`) // Este endpoint ya está bien
+            fetch(`${API_URL}?endpoint=getLeagueData`)
         ]);
 
         const dashboardResult = await dashboardRes.json();
         if (dashboardResult.success) {
             renderDashboard(dashboardResult.data);
-            renderLastUpdatedMatches(dashboardResult.data.lastUpdatedMatches); // NUEVO
+            renderLastUpdatedMatches(dashboardResult.data.lastUpdatedMatches);
         } else {
             console.error("Error al cargar datos del dashboard:", dashboardResult.error);
             alert("Error al cargar datos del dashboard.");
@@ -53,8 +74,8 @@ async function fetchAllData() {
         const leagueResult = await leagueRes.json();
         if (leagueResult.success) {
             leagueData = leagueResult.data;
-            renderZoneView();
-            renderMatchesList();
+            renderClassificationTable(); // Renderizar tabla de clasificación
+            renderMatchesList(); // Renderizar lista de partidos
         } else {
             console.error("Error al cargar datos de la liga:", leagueResult.error);
             alert("Error al cargar datos de la liga.");
@@ -73,14 +94,13 @@ function renderDashboard(data) {
 
     const leadersA = document.getElementById('leaders-a');
     leadersA.innerHTML = '';
-    data.lideresA.forEach((team, i) => leadersA.innerHTML += `<li><strong>${i+1}.</strong> ${team.Pareja}</li>`);
+    data.lideresA.forEach((team, i) => leadersA.innerHTML += `<li><span class="team-name">${i+1}. ${team.Pareja}</span> <span class="team-stats">${team.Puntos} Pts | ${team.PJ} PJ</span></li>`);
 
     const leadersB = document.getElementById('leaders-b');
     leadersB.innerHTML = '';
-    data.lideresB.forEach((team, i) => leadersB.innerHTML += `<li><strong>${i+1}.</strong> ${team.Pareja}</li>`);
+    data.lideresB.forEach((team, i) => leadersB.innerHTML += `<li><span class="team-name">${i+1}. ${team.Pareja}</span> <span class="team-stats">${team.Puntos} Pts | ${team.PJ} PJ</span></li>`);
 }
 
-// NUEVA FUNCIÓN DE RENDERIZADO PARA ÚLTIMOS PARTIDOS
 function renderLastUpdatedMatches(matches) {
     const container = document.getElementById('last-updated-matches-list');
     container.innerHTML = '';
@@ -88,31 +108,42 @@ function renderLastUpdatedMatches(matches) {
         matches.forEach(match => {
             const matchItem = document.createElement('div');
             matchItem.className = 'match-item';
+            
+            const resultHtml = match.estado === 'Jugado' ? `<strong>${match.resultado}</strong>` : `<span class="result pending">Pendiente</span>`;
+
             matchItem.innerHTML = `
                 <div class="match-info">
-                    <span>${match.pareja1} vs ${match.pareja2}</span>
-                    <strong class="match-result">${match.resultado}</strong>
+                    <div class="teams">${match.pareja1} vs ${match.pareja2}</div>
+                    <div class="result-status">${resultHtml}</div>
                 </div>
                 <span class="match-date">${match.timestamp}</span>
+                <div class="match-actions">
+                    <button class="action-btn edit" data-match-id="${match.id}">✏️</button>
+                    <button class="action-btn delete" data-match-id="${match.id}">🗑️</button>
+                </div>
             `;
             container.appendChild(matchItem);
         });
+        // Añadir Event Listeners a los nuevos botones en "Últimos Partidos"
+        document.querySelectorAll('#last-updated-matches-list .edit').forEach(btn => {
+            btn.addEventListener('click', (e) => openResultModal(e.target.dataset.matchId));
+        });
+        document.querySelectorAll('#last-updated-matches-list .delete').forEach(btn => {
+            btn.addEventListener('click', (e) => handleDeleteMatch(e.target.dataset.matchId));
+        });
+
     } else {
         container.innerHTML = '<p>No hay partidos registrados recientemente.</p>';
     }
 }
 
-function renderZoneView() {
-    document.querySelectorAll('.zone-button').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.zone === currentZone);
-    });
-    renderClassificationTable();
-}
-
 function renderClassificationTable() {
+    document.querySelectorAll('.zone-selector .zone-button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.zone === currentZoneClassification);
+    });
     const tableBody = document.getElementById('classification-table-body');
     tableBody.innerHTML = '';
-    const filteredClassification = leagueData.clasificacion.filter(team => team.Zona === currentZone);
+    const filteredClassification = leagueData.clasificacion.filter(team => team.Zona === currentZoneClassification);
     
     filteredClassification.forEach((team, index) => {
         const row = document.createElement('tr');
@@ -131,7 +162,20 @@ function renderClassificationTable() {
 function renderMatchesList() {
     const container = document.getElementById('matches-list-container');
     container.innerHTML = '';
-    leagueData.partidos.forEach(match => {
+
+    // Filtrar los partidos según los filtros seleccionados
+    const filteredMatches = leagueData.partidos.filter(match => {
+        const matchesZone = (currentFilterZone === 'all' || match.Zona === currentFilterZone);
+        const matchesEstado = (currentFilterEstado === 'all' || match.Estado === currentFilterEstado);
+        return matchesZone && matchesEstado;
+    });
+
+    if (filteredMatches.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--secondary-text-color);">No hay partidos que coincidan con los filtros.</p>';
+        return;
+    }
+
+    filteredMatches.forEach(match => {
         const matchEl = document.createElement('div');
         matchEl.className = 'match-item';
         
@@ -139,7 +183,7 @@ function renderMatchesList() {
         const team2Name = (match.ganador == 2) ? `<strong class="winner">${match['Nombre Pareja 2']}</strong>` : `<span>${match['Nombre Pareja 2']}</span>`;
 
         let resultHtml;
-        let actionsHtml = ''; // Inicializar vacío
+        let actionsHtml = '';
 
         if (match.Estado === 'Jugado') {
             resultHtml = `<div class="result">${match.Resultado}</div>`;
@@ -149,7 +193,8 @@ function renderMatchesList() {
                     <button class="action-btn delete" data-match-id="${match['ID Partido']}">🗑️</button>
                 </div>`;
         } else {
-            resultHtml = `<div class="result pending">Pendiente</div><button class="primary-button add-result-btn" data-match-id="${match['ID Partido']}">Añadir Resultado</button>`;
+            resultHtml = `<div class="result pending">Pendiente</div>`;
+            actionsHtml = `<div class="match-actions"><button class="primary-button add-result-btn" data-match-id="${match['ID Partido']}">Añadir Resultado</button></div>`;
         }
         
         matchEl.innerHTML = `
@@ -162,11 +207,11 @@ function renderMatchesList() {
         container.appendChild(matchEl);
     });
 
-    // Añadir Event Listeners a los nuevos botones
-    document.querySelectorAll('.add-result-btn, .edit').forEach(btn => {
+    // Añadir Event Listeners a los botones de la lista principal
+    document.querySelectorAll('#matches-list-container .add-result-btn, #matches-list-container .edit').forEach(btn => {
         btn.addEventListener('click', (e) => openResultModal(e.target.dataset.matchId));
     });
-    document.querySelectorAll('.delete').forEach(btn => {
+    document.querySelectorAll('#matches-list-container .delete').forEach(btn => {
         btn.addEventListener('click', (e) => handleDeleteMatch(e.target.dataset.matchId));
     });
 }
@@ -177,6 +222,8 @@ function openResultModal(matchId) {
     const form = document.getElementById('result-form');
     form.reset();
     document.getElementById('result-form-status').textContent = '';
+    document.getElementById('result-form-status').classList.remove('error', 'success');
+
 
     const match = leagueData.partidos.find(p => p['ID Partido'] == matchId);
     if (!match) {
@@ -189,26 +236,24 @@ function openResultModal(matchId) {
     document.getElementById('modal-team1-name').textContent = match['Nombre Pareja 1'];
     document.getElementById('modal-team2-name').textContent = match['Nombre Pareja 2'];
     
-    // Rellenar si el partido ya está jugado
     if (match.Estado === 'Jugado' && match.Resultado) {
         const sets = match.Resultado.split(', ');
         if (sets[0]) {
             const [s1p1, s1p2] = sets[0].split('-');
             document.getElementById('set1_p1').value = s1p1;
             document.getElementById('set1_p2').value = s1p2;
-        }
+        } else { /* default to empty */ }
         if (sets[1]) {
             const [s2p1, s2p2] = sets[1].split('-');
             document.getElementById('set2_p1').value = s2p1;
             document.getElementById('set2_p2').value = s2p2;
-        }
+        } else { /* default to empty */ }
         if (sets[2]) {
             const [s3p1, s3p2] = sets[2].split('-');
             document.getElementById('set3_p1').value = s3p1;
             document.getElementById('set3_p2').value = s3p2;
-        }
+        } else { /* default to empty */ }
     } else {
-        // Limpiar inputs si el partido no está jugado
         document.getElementById('set1_p1').value = ''; document.getElementById('set1_p2').value = '';
         document.getElementById('set2_p1').value = ''; document.getElementById('set2_p2').value = '';
         document.getElementById('set3_p1').value = ''; document.getElementById('set3_p2').value = '';
@@ -267,7 +312,7 @@ async function handleDeleteMatch(matchId) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ action: 'deleteMatchResult', data: { partidoId: matchId } }) // CORRECCIÓN AQUÍ: partidoId: matchId
+            body: JSON.stringify({ action: 'deleteMatchResult', data: { partidoId: matchId } })
         });
         const result = await response.json();
         if (result.success) {
