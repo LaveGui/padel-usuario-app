@@ -104,32 +104,33 @@ function renderDashboard(data) {
 function renderLastUpdatedMatches(matches) {
     const container = document.getElementById('last-updated-matches-list');
     container.innerHTML = '';
+    
     if (matches && matches.length > 0) {
         matches.forEach(match => {
-            const matchItem = document.createElement('div');
-            matchItem.className = 'match-item';
+            const matchCard = document.createElement('div');
+            matchCard.className = 'last-match-card';
             
-            const resultHtml = match.estado === 'Jugado' ? `<strong>${match.resultado}</strong>` : `<span class="result-status pending">Pendiente</span>`;
-
-            matchItem.innerHTML = `
-                <div class="match-info">
-                    <div class="teams">${match.pareja1} vs ${match.pareja2}</div>
-                    <div class="result-status">${resultHtml}</div>
+            // Estructura HTML que coincide con el nuevo diseño
+            matchCard.innerHTML = `
+                <div class="match-details">
+                    <p class="teams">${match.pareja1} vs ${match.pareja2}</p>
+                    <p class="result">${match.resultado}</p>
+                    <p class="timestamp">Registrado: ${match.timestamp}</p>
                 </div>
-                <span class="match-date">${match.timestamp}</span>
                 <div class="match-actions">
-                    <button class="action-btn edit" data-match-id="${match.id}">✏️</button>
-                    <button class="action-btn delete" data-match-id="${match.id}">🗑️</button>
+                    <button class="action-btn edit" title="Editar Resultado" data-match-id="${match.id}">✏️</button>
+                    <button class="action-btn delete" title="Eliminar Resultado" data-match-id="${match.id}">🗑️</button>
                 </div>
             `;
-            container.appendChild(matchItem);
+            container.appendChild(matchCard);
         });
-        // Añadir Event Listeners a los nuevos botones en "Últimos Partidos"
+
+        // Volvemos a asignar los listeners a los nuevos botones
         document.querySelectorAll('#last-updated-matches-list .edit').forEach(btn => {
-            btn.addEventListener('click', (e) => openResultModal(e.target.dataset.matchId));
+            btn.addEventListener('click', (e) => openResultModal(e.target.closest('.action-btn').dataset.matchId));
         });
         document.querySelectorAll('#last-updated-matches-list .delete').forEach(btn => {
-            btn.addEventListener('click', (e) => handleDeleteMatch(e.target.dataset.matchId));
+            btn.addEventListener('click', (e) => handleDeleteMatch(e.target.closest('.action-btn').dataset.matchId));
         });
 
     } else {

@@ -35,9 +35,9 @@ header p { color: var(--secondary-text-color); font-weight: 600; }
 .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; }
 .stat-card { text-align: center; }
 .stat-card span { display: block; font-size: 0.9em; color: var(--secondary-text-color); }
-.stat-card strong { display: block; font-size: 1.8em; font-weight: 700; color: var(--primary-color); } /* Ajustado tamaño de fuente */
+.stat-card strong { display: block; font-size: 1.8em; font-weight: 700; color: var(--primary-color); }
 
-.leaders-card h2, .last-matches-card h2 { text-align: center; margin: 0 0 20px 0; color: var(--primary-color); }
+.leaders-card h2, .last-matches-card h2 { text-align: center; margin: 0 0 25px 0; color: var(--primary-color); }
 .leaders-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .leader-group h3 { margin: 0 0 10px 0; border-bottom: 2px solid var(--border-color); padding-bottom: 5px; color: var(--text-color); }
 .leader-group ol { list-style: none; padding: 0; margin: 0; }
@@ -54,80 +54,57 @@ header p { color: var(--secondary-text-color); font-weight: 600; }
 .leader-group li .team-name { font-size: 1.1em; color: var(--primary-color); margin-bottom: 3px;}
 .leader-group li .team-stats { font-size: 0.85em; color: var(--secondary-text-color); }
 
+/* ============================================================ */
+/* ========= SECCIÓN ÚLTIMOS PARTIDOS (DISEÑO MEJORADO) ======== */
+/* ============================================================ */
 
-/* Sección Últimos Partidos Registrados (con botones de acción) */
-#last-updated-matches-list .match-item {
-    background: #fdfdfd;
-    border: 1px solid #e0e6ed;
-    padding: 15px 18px; /* Aumentado padding para más aire */
-    border-radius: 10px;
-    margin-bottom: 8px;
+#last-updated-matches-list {
+    display: grid;
+    grid-template-columns: 1fr; /* Una columna para la lista */
+    gap: 15px;
+}
+
+.last-match-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     display: flex;
-    flex-wrap: wrap; /* Permitir que los elementos se envuelvan en pantallas pequeñas */
     justify-content: space-between;
     align-items: center;
-    font-size: 0.95em;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-}
-#last-updated-matches-list .match-info {
-    flex-grow: 1; /* Permitir que la info de partido ocupe el espacio disponible */
-    display: flex;
-    flex-direction: column; /* Apilar parejas y resultado */
-    min-width: 180px; /* Asegurar un ancho mínimo para la información principal */
-    margin-right: 15px; /* Espacio entre la info y las acciones/fecha */
-}
-#last-updated-matches-list .match-info .teams {
-    font-weight: 600;
-    margin-bottom: 3px;
-    color: var(--text-color);
-    line-height: 1.2; /* Ajuste de altura de línea para nombres largos */
-}
-#last-updated-matches-list .match-info .result-status {
-    font-size: 1em; /* Un poco más grande para el resultado */
-    color: var(--primary-color);
-    font-weight: 700;
-}
-#last-updated-matches-list .match-info .result-status.pending {
-    color: var(--secondary-text-color);
-    font-weight: 400;
-}
-#last-updated-matches-list .match-date {
-    font-size: 0.8em;
-    color: var(--secondary-text-color);
-    white-space: nowrap;
-    text-align: right; /* Alineamos la fecha a la derecha */
-    margin-left: auto; /* Empuja la fecha a la derecha si hay espacio */
-    margin-right: 15px; /* Espacio antes de los botones */
-    line-height: 1.2;
-}
-#last-updated-matches-list .match-actions {
-    display: flex; /* Para que los botones estén uno al lado del otro */
-    gap: 5px; /* Pequeño espacio entre botones */
-    flex-shrink: 0; /* Evitar que los botones se encojan */
+    gap: 15px;
 }
 
-/* Media query para pantallas pequeñas (si es necesario un ajuste más específico) */
-@media (max-width: 480px) {
-    #last-updated-matches-list .match-item {
-        flex-direction: column; /* Apilar elementos en pantallas muy pequeñas */
-        align-items: flex-start;
-    }
-    #last-updated-matches-list .match-info {
-        margin-right: 0;
-        margin-bottom: 10px;
-        width: 100%; /* Ocupar todo el ancho */
-    }
-    #last-updated-matches-list .match-date {
-        margin-left: 0;
-        margin-right: 0;
-        width: 100%;
-        text-align: left; /* Alineamos la fecha a la izquierda en móvil */
-        margin-bottom: 10px;
-    }
-    #last-updated-matches-list .match-actions {
-        width: 100%;
-        justify-content: flex-start; /* Alinea los botones a la izquierda */
-    }
+.last-match-card .match-details {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Espacio entre los textos */
+    flex-grow: 1;
+}
+
+.last-match-card .teams {
+    font-weight: 700;
+    font-size: 1.1em;
+    color: var(--text-color);
+    line-height: 1.3;
+}
+
+.last-match-card .result {
+    font-weight: 600;
+    font-size: 1em;
+    color: var(--primary-color);
+}
+
+.last-match-card .timestamp {
+    font-size: 0.8em;
+    color: var(--secondary-text-color);
+}
+
+.last-match-card .match-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
 }
 
 /* Management Section */
@@ -341,4 +318,7 @@ tr:hover { background-color: #f8f9fa; }
     .score-input { width: 40px; padding: 6px; }
     .match-filters { flex-direction: column; align-items: stretch; }
     .filter-group { justify-content: center; }
+    .last-match-card { flex-direction: column; align-items: flex-start; }
+    .last-match-card .match-details { margin-bottom: 15px; }
+    .last-match-card .match-actions { align-self: flex-end; }
 }
