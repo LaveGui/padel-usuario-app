@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Liga de Pádel</title>
+    <link rel="stylesheet" href="admin.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Panel de Administración</h1>
+            <p>Progreso - Fase de Grupos</p>
+        </header>
+
+        <main>
+            <section class="card dashboard">
+                <div class="stat-card">
+                    <span>Progreso de la Fase</span>
+                    <strong id="stat-progreso">-%</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Partidos Jugados (A)</span>
+                    <strong id="stat-partidos-a">-/-</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Partidos Jugados (B)</span>
+                    <strong id="stat-partidos-b">-/-</strong>
+                </div>
+            </section>
+            <section class="card leaders-card">
+                <h2>Líderes Actuales</h2>
+                <div class="leaders-grid">
+                    <div class="leader-group">
+                        <h3>Grupo A</h3>
+                        <ol id="leaders-a"></ol>
+                    </div>
+                    <div class="leader-group">
+                        <h3>Grupo B</h3>
+                        <ol id="leaders-b"></ol>
+                    </div>
+                </div>
+            </section>
+
+            <section class="management-section">
+                <div class="tabs">
+                    <button class="tab-button active" data-tab="partidos">Gestión de Partidos</button>
+                    <button class="tab-button" data-tab="clasificacion">Ver Clasificación</button>
+                </div>
+
+                <div id="tab-content-partidos" class="tab-content active">
+                    <div id="matches-list-container"></div>
+                </div>
+
+                <div id="tab-content-clasificacion" class="tab-content">
+                    <div class="zone-selector">
+                        <button class="zone-button active" data-zone="A">GRUPO A</button>
+                        <button class="zone-button" data-zone="B">GRUPO B</button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th><th>Pareja</th><th>PJ</th><th>Puntos</th><th>DS</th><th>DJ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="classification-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="result-modal" class="modal-overlay hidden">
+         <div class="modal-content">
+            <button class="modal-close" id="modal-close-btn">&times;</button>
+            <h2 id="modal-title">Añadir Resultado</h2>
+            <form id="result-form">
+                <input type="hidden" id="match-id-input">
+                <div class="result-grid">
+                    <div></div> <div id="modal-team1-name" class="team-header"></div>
+                    <div id="modal-team2-name" class="team-header"></div>
+                    
+                    <label for="set1_p1" class="set-label">Set 1</label>
+                    <input type="number" id="set1_p1" class="score-input" min="0" max="10">
+                    <input type="number" id="set1_p2" class="score-input" min="0" max="10">
+
+                    <label for="set2_p1" class="set-label">Set 2</label>
+                    <input type="number" id="set2_p1" class="score-input" min="0" max="10">
+                    <input type="number" id="set2_p2" class="score-input" min="0" max="10">
+
+                    <label for="set3_p1" class="set-label">Set 3 (si aplica)</label>
+                    <input type="number" id="set3_p1" class="score-input" min="0" max="20">
+                    <input type="number" id="set3_p2" class="score-input" min="0" max="20">
+                </div>
+                <button type="submit" class="primary-button">Guardar Resultado</button>
+                <div id="result-form-status"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
