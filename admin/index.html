@@ -45,6 +45,13 @@
                 </div>
             </section>
 
+            <section class="card last-matches-card">
+                <h2>Últimos Partidos Registrados</h2>
+                <div id="last-updated-matches-list">
+                    <p>Cargando últimos partidos...</p>
+                </div>
+            </section>
+
             <section class="management-section">
                 <div class="tabs">
                     <button class="tab-button active" data-tab="partidos">Gestión de Partidos</button>
@@ -81,24 +88,36 @@
             <h2 id="modal-title">Añadir Resultado</h2>
             <form id="result-form">
                 <input type="hidden" id="match-id-input">
-                <div class="result-grid">
-                    <div></div> <div id="modal-team1-name" class="team-header"></div>
-                    <div id="modal-team2-name" class="team-header"></div>
-                    
-                    <label for="set1_p1" class="set-label">Set 1</label>
-                    <input type="number" id="set1_p1" class="score-input" min="0" max="10">
-                    <input type="number" id="set1_p2" class="score-input" min="0" max="10">
+                <div class="modal-match-info">
+                    <span id="modal-team1-name"></span>
+                    <span class="vs-text">vs</span>
+                    <span id="modal-team2-name"></span>
+                </div>
+                
+                <div class="result-inputs">
+                    <div class="set-row">
+                        <label for="set1_p1" class="set-label">Set 1</label>
+                        <input type="number" id="set1_p1" class="score-input" min="0" max="10">
+                        <span class="set-separator">-</span>
+                        <input type="number" id="set1_p2" class="score-input" min="0" max="10">
+                    </div>
 
-                    <label for="set2_p1" class="set-label">Set 2</label>
-                    <input type="number" id="set2_p1" class="score-input" min="0" max="10">
-                    <input type="number" id="set2_p2" class="score-input" min="0" max="10">
+                    <div class="set-row">
+                        <label for="set2_p1" class="set-label">Set 2</label>
+                        <input type="number" id="set2_p1" class="score-input" min="0" max="10">
+                        <span class="set-separator">-</span>
+                        <input type="number" id="set2_p2" class="score-input" min="0" max="10">
+                    </div>
 
-                    <label for="set3_p1" class="set-label">Set 3 (si aplica)</label>
-                    <input type="number" id="set3_p1" class="score-input" min="0" max="20">
-                    <input type="number" id="set3_p2" class="score-input" min="0" max="20">
+                    <div class="set-row">
+                        <label for="set3_p1" class="set-label">Set 3 (si aplica)</label>
+                        <input type="number" id="set3_p1" class="score-input" min="0" max="20">
+                        <span class="set-separator">-</span>
+                        <input type="number" id="set3_p2" class="score-input" min="0" max="20">
+                    </div>
                 </div>
                 <button type="submit" class="primary-button">Guardar Resultado</button>
-                <div id="result-form-status"></div>
+                <div id="result-form-status" class="form-status"></div>
             </form>
         </div>
     </div>

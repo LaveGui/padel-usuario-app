@@ -1,4 +1,4 @@
-/* Variables y estilos base (similares a la app de usuario) */
+/* Variables y estilos base */
 :root {
     --bg-color: #f0f2f5;
     --card-bg: #ffffff;
@@ -14,61 +14,225 @@
 body { font-family: var(--font-family); background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; line-height: 1.6; }
 .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
 header { text-align: center; margin-bottom: 30px; }
-header h1 { margin: 0; }
+header h1 { margin: 0; color: var(--primary-color); }
 header p { color: var(--secondary-text-color); font-weight: 600; }
 .card { background: var(--card-bg); border-radius: 18px; box-shadow: var(--shadow); padding: 25px; margin-bottom: 25px; }
 .hidden { display: none !important; }
+.primary-button {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+.primary-button:hover { background-color: var(--primary-hover); }
 
 /* Dashboard */
 .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; }
 .stat-card { text-align: center; }
 .stat-card span { display: block; font-size: 0.9em; color: var(--secondary-text-color); }
 .stat-card strong { display: block; font-size: 2em; font-weight: 700; color: var(--primary-color); }
-.leaders-card h2 { text-align: center; margin: 0 0 20px 0; }
+.leaders-card h2, .last-matches-card h2 { text-align: center; margin: 0 0 20px 0; color: var(--primary-color); }
 .leaders-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.leader-group h3 { margin: 0 0 10px 0; border-bottom: 2px solid var(--border-color); padding-bottom: 5px; }
+.leader-group h3 { margin: 0 0 10px 0; border-bottom: 2px solid var(--border-color); padding-bottom: 5px; color: var(--text-color); }
 .leader-group ol { list-style: none; padding: 0; margin: 0; }
-.leader-group li { font-weight: 600; margin-bottom: 5px; }
+.leader-group li { font-weight: 600; margin-bottom: 5px; background-color: var(--bg-color); padding: 8px 12px; border-radius: 8px; }
+
+/* Sección Últimos Partidos */
+#last-updated-matches-list .match-item {
+    background: #fdfdfd;
+    border: 1px solid #e0e6ed;
+    padding: 12px 18px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95em;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+}
+#last-updated-matches-list .match-info {
+    flex-grow: 1;
+}
+#last-updated-matches-list .match-info span {
+    font-weight: 600;
+}
+#last-updated-matches-list .match-date {
+    font-size: 0.8em;
+    color: var(--secondary-text-color);
+    margin-left: 15px;
+}
+
 
 /* Management Section */
 .tabs { display: flex; background-color: #e9ecef; padding: 5px; border-radius: 25px; margin-bottom: 30px; }
-.tab-button { flex: 1; padding: 10px 15px; border: none; background: none; cursor: pointer; font-size: 1em; font-weight: 600; color: var(--secondary-text-color); border-radius: 20px; }
+.tab-button { flex: 1; padding: 10px 15px; border: none; background: none; cursor: pointer; font-size: 1em; font-weight: 600; color: var(--secondary-text-color); border-radius: 20px; transition: background-color 0.2s ease, color 0.2s ease; }
 .tab-button.active { background-color: var(--card-bg); color: var(--primary-color); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-.tab-content { display: none; }
+.tab-button:hover:not(.active) { background-color: #dbe4eb; }
+
+.tab-content { display: none; padding-top: 20px; }
 .tab-content.active { display: block; }
 
 /* Estilos de tabla y partidos (reutilizados) */
 .zone-selector { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-.zone-button { padding: 8px 20px; border: 1px solid var(--border-color); background-color: transparent; color: var(--secondary-text-color); font-weight: 600; border-radius: 20px; cursor: pointer; }
+.zone-button { padding: 8px 20px; border: 1px solid var(--border-color); background-color: transparent; color: var(--secondary-text-color); font-weight: 600; border-radius: 20px; cursor: pointer; transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; }
 .zone-button.active { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
-.table-wrapper { overflow-x: auto; }
+.zone-button:hover:not(.active) { background-color: #f5f5f5; border-color: #c9d2da; }
+
+.table-wrapper { overflow-x: auto; background-color: var(--card-bg); border-radius: 12px; padding: 15px; box-shadow: var(--shadow); }
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
-.match-item { background: #fff; border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; margin-bottom: 10px; display: grid; grid-template-columns: 1fr auto; gap: 15px; align-items: center; }
-.match-item .winner { font-weight: 700; }
-.match-actions { display: flex; gap: 10px; }
-.action-btn { background: none; border: none; cursor: pointer; font-size: 1.2em; padding: 5px; }
-.action-btn.edit:hover { color: var(--primary-color); }
-.action-btn.delete:hover { color: var(--danger-color); }
+th { background-color: var(--bg-color); font-weight: 700; color: var(--text-color); }
+tr:last-child td { border-bottom: none; }
+tr:hover { background-color: #f8f9fa; }
 
-/* Modal (reutilizado) */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-.modal-content { background: #fff; padding: 30px; border-radius: 18px; width: 90%; max-width: 450px; position: relative; }.primary-button { /* ... estilos de botones ... */ }
+.match-item { 
+    background: var(--card-bg); 
+    border: 1px solid var(--border-color); 
+    padding: 15px; 
+    border-radius: 12px; 
+    margin-bottom: 10px; 
+    display: flex; /* Usar flexbox para mejor alineación */
+    justify-content: space-between; /* Espacio entre info y acciones */
+    align-items: center; 
+    gap: 15px; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.match-info-display { flex-grow: 1; display: flex; flex-direction: column; }
+.match-info-display .teams { font-weight: 600; margin-bottom: 5px; }
+.match-info-display .result { font-weight: 700; color: var(--primary-color); font-size: 1.1em; }
+.match-info-display .result.pending { color: var(--secondary-text-color); font-size: 0.9em; font-weight: 400; }
+
+.match-actions { display: flex; gap: 8px; }
+.action-btn { 
+    background: none; border: none; cursor: pointer; 
+    font-size: 1.1em; padding: 8px; border-radius: 50%; 
+    display: flex; align-items: center; justify-content: center;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+.action-btn.edit { color: var(--primary-color); }
+.action-btn.delete { color: var(--danger-color); }
+.action-btn:hover { background-color: #f0f2f5; }
+.action-btn.edit:hover { color: var(--primary-hover); }
+.action-btn.delete:hover { color: #c0392b; }
+
+/* Modal Styles - Mejorados */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.modal-content {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    position: relative;
+    text-align: center;
+}
 .modal-close {
     position: absolute;
     top: 15px;
-    right: 20px;
+    right: 15px;
     background: none;
     border: none;
-    font-size: 2.2em;
+    font-size: 1.8em;
     color: var(--secondary-text-color);
     cursor: pointer;
     line-height: 1;
-    padding: 0;
 }
-.modal-close:hover {
+.modal-title {
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 1.8em;
+}
+.modal-match-info {
+    font-size: 1.3em;
+    font-weight: 700;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+.modal-match-info .vs-text {
+    font-size: 0.8em;
+    color: var(--secondary-text-color);
+    font-weight: 400;
+}
+.result-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+.set-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.set-label {
+    flex-basis: 70px; /* Ancho fijo para las etiquetas de Set */
+    text-align: right;
+    font-weight: 600;
     color: var(--text-color);
+    font-size: 0.95em;
 }
-.primary-button { background: var(--primary-color); color: #fff; border: none; padding: 12px 20px; font-size: 1em; font-weight: 700; border-radius: 30px; cursor: pointer; transition: background 0.2s; width: 100%; box-sizing: border-box; margin-top: 10px; }
-.primary-button:hover { background: var(--primary-hover); }
+.score-input {
+    width: 50px;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1em;
+    text-align: center;
+    -moz-appearance: textfield; /* Para ocultar flechas en Firefox */
+}
+.score-input::-webkit-outer-spin-button,
+.score-input::-webkit-inner-spin-button {
+    -webkit-appearance: none; /* Ocultar flechas en Chrome/Safari */
+    margin: 0;
+}
+.set-separator {
+    font-weight: 700;
+    color: var(--secondary-text-color);
+    font-size: 1.1em;
+}
+.form-status {
+    margin-top: 15px;
+    font-size: 0.9em;
+    color: var(--secondary-text-color);
+}
+.form-status.error {
+    color: var(--danger-color);
+    font-weight: 600;
+}
+.form-status.success {
+    color: #27ae60;
+    font-weight: 600;
+}
 
+/* Responsivo */
+@media (max-width: 600px) {
+    .dashboard, .leaders-grid { grid-template-columns: 1fr; }
+    .stat-card strong { font-size: 1.8em; }
+    .leader-group h3 { text-align: center; }
+    .leaders-card h2 { font-size: 1.5em; }
+    .modal-content { padding: 20px; }
+    .modal-title { font-size: 1.5em; }
+    .modal-match-info { font-size: 1.1em; }
+    .set-row { flex-wrap: wrap; justify-content: space-around; }
+    .set-label { flex-basis: 100%; text-align: center; margin-bottom: 5px; }
+    .score-input { width: 40px; padding: 6px; }
+}

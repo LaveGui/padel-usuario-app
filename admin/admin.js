@@ -34,16 +34,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- CARGA DE DATOS ---
 async function fetchAllData() {
-    // Mostramos loaders si es necesario
+    // Mostramos loaders si es necesario (se puede añadir un spinner, etc.)
     try {
         const [dashboardRes, leagueRes] = await Promise.all([
             fetch(`${API_URL}?endpoint=getAdminDashboardData`),
-            fetch(`${API_URL}?endpoint=getLeagueData`)
+            fetch(`${API_URL}?endpoint=getLeagueData`) // Este endpoint ya está bien
         ]);
 
         const dashboardResult = await dashboardRes.json();
         if (dashboardResult.success) {
             renderDashboard(dashboardResult.data);
+            renderLastUpdatedMatches(dashboardResult.data.lastUpdatedMatches); // NUEVO
+        } else {
+            console.error("Error al cargar datos del dashboard:", dashboardResult.error);
+            alert("Error al cargar datos del dashboard.");
         }
 
         const leagueResult = await leagueRes.json();
@@ -51,9 +55,12 @@ async function fetchAllData() {
             leagueData = leagueResult.data;
             renderZoneView();
             renderMatchesList();
+        } else {
+            console.error("Error al cargar datos de la liga:", leagueResult.error);
+            alert("Error al cargar datos de la liga.");
         }
     } catch (error) {
-        console.error("Error al cargar los datos del admin:", error);
+        console.error("Error general al cargar los datos del admin:", error);
         alert("No se pudieron cargar los datos del panel. Revisa la consola.");
     }
 }
@@ -71,6 +78,28 @@ function renderDashboard(data) {
     const leadersB = document.getElementById('leaders-b');
     leadersB.innerHTML = '';
     data.lideresB.forEach((team, i) => leadersB.innerHTML += `<li><strong>${i+1}.</strong> ${team.Pareja}</li>`);
+}
+
+// NUEVA FUNCIÓN DE RENDERIZADO PARA ÚLTIMOS PARTIDOS
+function renderLastUpdatedMatches(matches) {
+    const container = document.getElementById('last-updated-matches-list');
+    container.innerHTML = '';
+    if (matches && matches.length > 0) {
+        matches.forEach(match => {
+            const matchItem = document.createElement('div');
+            matchItem.className = 'match-item';
+            matchItem.innerHTML = `
+                <div class="match-info">
+                    <span>${match.pareja1} vs ${match.pareja2}</span>
+                    <strong class="match-result">${match.resultado}</strong>
+                </div>
+                <span class="match-date">${match.timestamp}</span>
+            `;
+            container.appendChild(matchItem);
+        });
+    } else {
+        container.innerHTML = '<p>No hay partidos registrados recientemente.</p>';
+    }
 }
 
 function renderZoneView() {
@@ -110,22 +139,24 @@ function renderMatchesList() {
         const team2Name = (match.ganador == 2) ? `<strong class="winner">${match['Nombre Pareja 2']}</strong>` : `<span>${match['Nombre Pareja 2']}</span>`;
 
         let resultHtml;
-        let actionsHtml = '<div class="match-actions"></div>';
+        let actionsHtml = ''; // Inicializar vacío
 
         if (match.Estado === 'Jugado') {
-            resultHtml = `<strong>${match.Resultado}</strong>`;
+            resultHtml = `<div class="result">${match.Resultado}</div>`;
             actionsHtml = `
                 <div class="match-actions">
                     <button class="action-btn edit" data-match-id="${match['ID Partido']}">✏️</button>
                     <button class="action-btn delete" data-match-id="${match['ID Partido']}">🗑️</button>
                 </div>`;
         } else {
-            resultHtml = `<button class="primary-button add-result-btn" data-match-id="${match['ID Partido']}">Añadir Resultado</button>`;
+            resultHtml = `<div class="result pending">Pendiente</div><button class="primary-button add-result-btn" data-match-id="${match['ID Partido']}">Añadir Resultado</button>`;
         }
         
         matchEl.innerHTML = `
-            <div>${team1Name} vs ${team2Name}</div>
-            <div>${resultHtml}</div>
+            <div class="match-info-display">
+                <div class="teams">${team1Name} vs ${team2Name}</div>
+                ${resultHtml}
+            </div>
             ${actionsHtml}
         `;
         container.appendChild(matchEl);
@@ -148,14 +179,18 @@ function openResultModal(matchId) {
     document.getElementById('result-form-status').textContent = '';
 
     const match = leagueData.partidos.find(p => p['ID Partido'] == matchId);
-    if (!match) return;
+    if (!match) {
+        console.error("Partido no encontrado:", matchId);
+        return;
+    }
 
     document.getElementById('modal-title').textContent = (match.Estado === 'Jugado') ? 'Editar Resultado' : 'Añadir Resultado';
     document.getElementById('match-id-input').value = matchId;
     document.getElementById('modal-team1-name').textContent = match['Nombre Pareja 1'];
     document.getElementById('modal-team2-name').textContent = match['Nombre Pareja 2'];
     
-    if (match.Estado === 'Jugado') {
+    // Rellenar si el partido ya está jugado
+    if (match.Estado === 'Jugado' && match.Resultado) {
         const sets = match.Resultado.split(', ');
         if (sets[0]) {
             const [s1p1, s1p2] = sets[0].split('-');
@@ -172,6 +207,11 @@ function openResultModal(matchId) {
             document.getElementById('set3_p1').value = s3p1;
             document.getElementById('set3_p2').value = s3p2;
         }
+    } else {
+        // Limpiar inputs si el partido no está jugado
+        document.getElementById('set1_p1').value = ''; document.getElementById('set1_p2').value = '';
+        document.getElementById('set2_p1').value = ''; document.getElementById('set2_p2').value = '';
+        document.getElementById('set3_p1').value = ''; document.getElementById('set3_p2').value = '';
     }
 
     modal.classList.remove('hidden');
@@ -181,6 +221,7 @@ async function submitMatchResult(event) {
     event.preventDefault();
     const statusDiv = document.getElementById('result-form-status');
     statusDiv.textContent = 'Guardando...';
+    statusDiv.classList.remove('error', 'success');
 
     const data = {
         partidoId: document.getElementById('match-id-input').value,
@@ -192,17 +233,26 @@ async function submitMatchResult(event) {
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ action: 'addMatchResult', data })
         });
         const result = await response.json();
         if (result.success) {
-            document.getElementById('result-modal').classList.add('hidden');
-            fetchAllData(); // Recargar todos los datos
+            statusDiv.textContent = '¡Resultado guardado con éxito!';
+            statusDiv.classList.add('success');
+            setTimeout(() => {
+                document.getElementById('result-modal').classList.add('hidden');
+                fetchAllData(); // Recargar todos los datos para actualizar el dashboard y listas
+            }, 1500);
         } else {
             throw new Error(result.error);
         }
     } catch (error) {
         statusDiv.textContent = `Error: ${error.message}`;
+        statusDiv.classList.add('error');
+        console.error("Error al guardar resultado:", error);
     }
 }
 
@@ -214,15 +264,20 @@ async function handleDeleteMatch(matchId) {
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
-            body: JSON.stringify({ action: 'deleteMatchResult', data: { partidoId } })
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ action: 'deleteMatchResult', data: { partidoId: matchId } }) // CORRECCIÓN AQUÍ: partidoId: matchId
         });
         const result = await response.json();
         if (result.success) {
+            alert("Resultado eliminado y clasificación recalculada.");
             fetchAllData(); // Recargar todos los datos
         } else {
             throw new Error(result.error);
         }
     } catch (error) {
         alert(`Error al eliminar el resultado: ${error.message}`);
+        console.error("Error al eliminar el resultado:", error);
     }
 }
